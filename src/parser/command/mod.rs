@@ -11,8 +11,6 @@ pub mod arbitrary;
 
 pub use arbitrary::ArbitraryCommand;
 
-pub trait Args<'a>: Parse<'a> {}
-
 pub struct Command<'a, A>
 where
     A: Args<'a>,
@@ -21,6 +19,8 @@ where
     pub cmd_name: &'a str,
     pub arguments: A,
 }
+
+pub trait Args<'a>: Parse<'a> {}
 
 impl<'a,A> Parse<'a> for Command<'a,A>
 where
