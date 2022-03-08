@@ -19,22 +19,22 @@ macro_rules! declare_token_ty {
 }
 
 declare_token_ty!(Backslash['\\']);
-declare_token_ty!(LeftSquareBracket['[']);
-declare_token_ty!(RightSquareBracket[']']);
-declare_token_ty!(LeftCurlyBrace['{']);
-declare_token_ty!(RightCurlyBrace['}']);
+declare_token_ty!(LeftBracket['[']);
+declare_token_ty!(RightBracket[']']);
+declare_token_ty!(LeftBrace['{']);
+declare_token_ty!(RightBrace['}']);
 
 trait DelimPair {
     type Left;
     type Right;
 }
 
-impl DelimPair for (LeftSquareBracket, RightSquareBracket) {
-    type Left = LeftSquareBracket;
-    type Right = RightSquareBracket;
+impl DelimPair for (LeftBracket, RightBracket) {
+    type Left = LeftBracket;
+    type Right = RightBracket;
 }
 
-impl DelimPair for (LeftCurlyBrace, RightCurlyBrace) {
-    type Left = LeftCurlyBrace;
-    type Right = RightCurlyBrace;
+impl DelimPair for (LeftBrace, RightBrace) {
+    type Left = LeftBrace;
+    type Right = RightBrace;
 }

@@ -1,20 +1,20 @@
 use super::{Command, Arguments};
 use crate::{
     parser::Parse,
-    tokens::{LeftCurlyBrace, LeftSquareBracket, RightCurlyBrace, RightSquareBracket},
+    tokens::{LeftBrace, LeftBracket, RightBrace, RightBracket},
 };
 use nom::{bytes::complete::is_not, character::complete::char, sequence::tuple, IResult, multi::many0, branch::alt};
 
 pub struct ArbitraryOptionalArgument<'a> {
-    pub left_bracket: LeftSquareBracket,
+    pub left_bracket: LeftBracket,
     pub verbatim: &'a str,
-    pub right_bracket: RightSquareBracket,
+    pub right_bracket: RightBracket,
 }
 
 pub struct ArbitraryRequiredArgument<'a> {
-    pub left_brace: LeftCurlyBrace,
+    pub left_brace: LeftBrace,
     pub verbatim: &'a str,
-    pub right_brace: RightCurlyBrace,
+    pub right_brace: RightBrace,
 }
 
 pub enum ArbitraryArgument<'a> {
@@ -38,9 +38,9 @@ impl<'a> Parse<'a> for ArbitraryOptionalArgument<'a> {
                     (
                         i,
                         (
-                            LeftSquareBracket(left_bracket),
+                            LeftBracket(left_bracket),
                             verbatim,
-                            RightSquareBracket(right_bracket),
+                            RightBracket(right_bracket),
                         ),
                     )
                 },
@@ -72,9 +72,9 @@ impl<'a> Parse<'a> for ArbitraryRequiredArgument<'a> {
                 (
                     i,
                     (
-                        LeftCurlyBrace(left_brace),
+                        LeftBrace(left_brace),
                         verbatim,
-                        RightCurlyBrace(right_brace),
+                        RightBrace(right_brace),
                     ),
                 )
             })?;
