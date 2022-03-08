@@ -11,29 +11,20 @@ pub mod arbitrary;
 
 pub use arbitrary::ArbitraryCommand;
 
-pub trait OptionalArgument<'a>: Parse<'a> {}
+pub trait Arguments<'a>: Parse<'a> {}
 
-pub trait RequiredArgument<'a>: Parse<'a> {}
-
-pub trait OptionalArgumentTuple<'a>: Parse<'a> {}
-
-pub trait RequiredArgumentTuple<'a>: Parse<'a> {}
-
-pub struct Command<'a, O, R>
+pub struct Command<'a, A>
 where
-    O: OptionalArgumentTuple<'a>,
-    R: RequiredArgumentTuple<'a>,
+    A: Arguments<'a>,
 {
     pub backslash: Backslash,
     pub cmd_name: &'a str,
-    pub optional_arguments: O,
-    pub required_arguments: R,
+    pub arguments: A,
 }
 
-impl<'a,O,R> Parse<'a> for Command<'a,O,R>
+impl<'a,A> Parse<'a> for Command<'a,A>
 where
-    O: OptionalArgumentTuple<'a>,
-    R: RequiredArgumentTuple<'a>,
+    A: Arguments<'a>,
 {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
@@ -44,8 +35,7 @@ where
             .map(|(i,(backslash, cmd_name))| (
                 (i, (Backslash(backslash), cmd_name))
             ))?;
-        let (i, optional_argument) = O::parse(i)?;
-        let (i, required_argument) = R::parse(i)?;
-        Ok((i, Self { backslash, cmd_name, optional_arguments: optional_argument, required_arguments: required_argument }))
+        let (i, arguments) = A::parse(i)?;
+        Ok((i, Self { backslash, cmd_name, arguments }))
     }
 }

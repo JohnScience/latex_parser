@@ -1,9 +1,9 @@
-use super::{Command, OptionalArgument, RequiredArgument, OptionalArgumentTuple, RequiredArgumentTuple};
+use super::{Command, Arguments};
 use crate::{
     parser::Parse,
     tokens::{LeftCurlyBrace, LeftSquareBracket, RightCurlyBrace, RightSquareBracket},
 };
-use nom::{bytes::complete::is_not, character::complete::char, sequence::tuple, IResult, multi::many0};
+use nom::{bytes::complete::is_not, character::complete::char, sequence::tuple, IResult, multi::many0, branch::alt};
 
 pub struct ArbitraryOptionalArgument<'a> {
     pub left_bracket: LeftSquareBracket,
@@ -17,10 +17,14 @@ pub struct ArbitraryRequiredArgument<'a> {
     pub right_brace: RightCurlyBrace,
 }
 
-type ArbitraryOptionalArguments<'a> = Vec<ArbitraryOptionalArgument<'a>>;
-type ArbitraryRequiredArguments<'a> = Vec<ArbitraryRequiredArgument<'a>>;
+pub enum ArbitraryArgument<'a> {
+    Optional(ArbitraryOptionalArgument<'a>),
+    Required(ArbitraryRequiredArgument<'a>),   
+}
 
-impl<'a> OptionalArgument<'a> for ArbitraryOptionalArgument<'a> {}
+pub type ArbitraryCommand<'a> = Command<'a, Vec<ArbitraryArgument<'a>>>;
+
+impl<'a> Arguments<'a> for ArbitraryOptionalArgument<'a> {}
 
 impl<'a> Parse<'a> for ArbitraryOptionalArgument<'a> {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
@@ -52,7 +56,7 @@ impl<'a> Parse<'a> for ArbitraryOptionalArgument<'a> {
     }
 }
 
-impl<'a> RequiredArgument<'a> for ArbitraryRequiredArgument<'a> {}
+impl<'a> Arguments<'a> for ArbitraryRequiredArgument<'a> {}
 
 impl<'a> Parse<'a> for ArbitraryRequiredArgument<'a> {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
@@ -85,28 +89,47 @@ impl<'a> Parse<'a> for ArbitraryRequiredArgument<'a> {
     }
 }
 
-impl<'a> Parse<'a> for ArbitraryOptionalArguments<'a> {
+impl<'a> Arguments<'a> for ArbitraryArgument<'a> {}
+
+// TODO: generate the code below using e.g. stateful macros
+impl<'a> ArbitraryArgument<'a> {
+    fn parse_optional<'b,'c>(i: &'b str) -> IResult<&'c str, Self>
+    where
+        'b: 'c,
+        'b: 'a 
+    {
+        ArbitraryOptionalArgument::parse(i)
+            .map(|(i, arg)| (i, ArbitraryArgument::Optional(arg)))
+    }
+
+    fn parse_required<'b,'c>(i: &'b str) -> IResult<&'c str, Self>
+    where
+        'b: 'c,
+        'b: 'a 
+    {
+        ArbitraryRequiredArgument::parse(i)
+            .map(|(i, arg)| (i, ArbitraryArgument::Required(arg)))
+    }
+}
+
+impl<'a> Parse<'a> for ArbitraryArgument<'a> {
+    fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
+    where
+            'b: 'c,
+            'b: 'a {
+        // TODO: generate the code below using e.g. stateful macros
+        alt((Self::parse_optional, Self::parse_required))(i)
+    }
+}
+
+impl<'a> Arguments<'a> for Vec<ArbitraryArgument<'a>> {}
+
+impl<'a> Parse<'a> for Vec<ArbitraryArgument<'a>> {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
         'b: 'c,
         'b: 'a
     {
-        many0(ArbitraryOptionalArgument::parse)(i)
+        many0(ArbitraryArgument::parse)(i)
     }
 }
-
-impl<'a> Parse<'a> for ArbitraryRequiredArguments<'a> {
-    fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
-    where
-        'b: 'c,
-        'b: 'a
-    {
-        many0(ArbitraryRequiredArgument::parse)(i)
-    }
-}
-
-impl<'a> OptionalArgumentTuple<'a> for ArbitraryOptionalArguments<'a> {}
-impl<'a> RequiredArgumentTuple<'a> for ArbitraryRequiredArguments<'a> {}
-
-pub type ArbitraryCommand<'a> =
-    Command<'a, ArbitraryOptionalArguments<'a>, ArbitraryRequiredArguments<'a>>;
