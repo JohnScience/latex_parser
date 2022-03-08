@@ -3,7 +3,7 @@ use crate::{
     parser::Parse,
     tokens::{LeftCurlyBrace, LeftSquareBracket, RightCurlyBrace, RightSquareBracket},
 };
-use nom::{bytes::complete::is_not, character::streaming::char, sequence::tuple, IResult, multi::many0};
+use nom::{bytes::complete::is_not, character::complete::char, sequence::tuple, IResult, multi::many0};
 
 pub struct ArbitraryOptionalArgument<'a> {
     pub left_bracket: LeftSquareBracket,

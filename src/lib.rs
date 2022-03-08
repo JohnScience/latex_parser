@@ -54,4 +54,22 @@ mod tests {
             Next line"
         );
     }
+
+    #[test]
+    fn parse_frac() {
+        let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse(
+            "\\frac{2}{5}"
+        ).unwrap();
+        assert_eq!(arbitrary_cmd.backslash.0, '\\');
+        assert_eq!(arbitrary_cmd.cmd_name, "frac");
+        assert_eq!(arbitrary_cmd.optional_arguments.len(), 0);
+        assert_eq!(arbitrary_cmd.required_arguments.len(), 2);
+        assert_eq!(arbitrary_cmd.required_arguments[0].left_brace.0, '{');
+        assert_eq!(arbitrary_cmd.required_arguments[0].verbatim, "2");
+        assert_eq!(arbitrary_cmd.required_arguments[0].right_brace.0, '}');
+        assert_eq!(arbitrary_cmd.required_arguments[1].left_brace.0, '{');
+        assert_eq!(arbitrary_cmd.required_arguments[1].verbatim, "5");
+        assert_eq!(arbitrary_cmd.required_arguments[1].right_brace.0, '}');
+        assert_eq!(i,"");
+    }
 }
