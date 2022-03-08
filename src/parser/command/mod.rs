@@ -11,11 +11,11 @@ pub mod arbitrary;
 
 pub use arbitrary::ArbitraryCommand;
 
-pub trait Arguments<'a>: Parse<'a> {}
+pub trait Args<'a>: Parse<'a> {}
 
 pub struct Command<'a, A>
 where
-    A: Arguments<'a>,
+    A: Args<'a>,
 {
     pub backslash: Backslash,
     pub cmd_name: &'a str,
@@ -24,7 +24,7 @@ where
 
 impl<'a,A> Parse<'a> for Command<'a,A>
 where
-    A: Arguments<'a>,
+    A: Args<'a>,
 {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where

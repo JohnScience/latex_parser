@@ -36,7 +36,7 @@ mod tests {
 
     #[test]
     fn parse_arbitrary_command_without_optional_arg() {
-        use crate::parser::command::arbitrary::ArbitraryArgument::{Required, Optional};
+        use crate::parser::command::arbitrary::ArbitraryArg::{Required, Optional};
 
         let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse(
             "\\textbf{Command without optional arguments} % bold text\n\
@@ -65,7 +65,7 @@ mod tests {
 
     #[test]
     fn parse_frac() {
-        use crate::parser::command::arbitrary::{ArbitraryRequiredArgument, ArbitraryOptionalArgument, ArbitraryArgument::{Required, Optional}};
+        use crate::parser::command::arbitrary::{ArbitraryBracedArg, ArbitraryBracketedArg, ArbitraryArg::{Required, Optional}};
 
         let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse(
             "\\frac{2}{5}"
@@ -76,7 +76,7 @@ mod tests {
 
         let (optional_arguments, required_arguments)
             = arbitrary_cmd.arguments.into_iter()
-            .fold((Vec::<ArbitraryOptionalArgument>::new(), Vec::<ArbitraryRequiredArgument>::new()), |(mut opt_args, mut req_args),arg| {
+            .fold((Vec::<ArbitraryBracketedArg>::new(), Vec::<ArbitraryBracedArg>::new()), |(mut opt_args, mut req_args),arg| {
                 match arg {
                     Required(req_arg) => { req_args.push(req_arg) },
                     Optional(opt_arg) => { opt_args.push(opt_arg) },
