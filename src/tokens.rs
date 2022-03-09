@@ -59,17 +59,20 @@ declare_char_token_ty!(LeftBrace['{']);
 declare_char_token_ty!(RightBrace['}']);
 declare_token_ty!(LineEnding<'a>["\n": &'a str]::line_ending);
 
-trait DelimPair {
+pub trait DelimPair {
     type Left;
     type Right;
 }
 
-impl DelimPair for (LeftBracket, RightBracket) {
+pub type Brackets = (LeftBracket, RightBracket);
+pub type Braces = (LeftBrace, RightBrace);
+
+impl DelimPair for Brackets {
     type Left = LeftBracket;
     type Right = RightBracket;
 }
 
-impl DelimPair for (LeftBrace, RightBrace) {
+impl DelimPair for Braces {
     type Left = LeftBrace;
     type Right = RightBrace;
 }

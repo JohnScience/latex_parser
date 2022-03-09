@@ -1,21 +1,21 @@
 use super::{Args, Command};
 use crate::{
     parser::Parse,
-    tokens::{LeftBrace, LeftBracket, RightBrace, RightBracket},
+    tokens::{LeftBrace, LeftBracket, RightBrace, RightBracket, DelimPair, Brackets, Braces},
 };
 use nom::IResult;
 
-pub struct ArbitraryBracketedArg<'a> {
-    pub left_bracket: LeftBracket,
+pub struct ArbitraryDelimitedArg<'a, D>
+where
+    D: DelimPair
+{
+    pub left_delim: D::Left,
     pub verbatim: &'a str,
-    pub right_bracket: RightBracket,
+    pub right_delim: D::Right,
 }
 
-pub struct ArbitraryBracedArg<'a> {
-    pub left_brace: LeftBrace,
-    pub verbatim: &'a str,
-    pub right_brace: RightBrace,
-}
+pub type ArbitraryBracketedArg<'a> = ArbitraryDelimitedArg<'a, Brackets>;
+pub type ArbitraryBracedArg<'a> = ArbitraryDelimitedArg<'a, Braces>;
 
 pub enum ArbitraryArg<'a> {
     Optional(ArbitraryBracketedArg<'a>),
@@ -68,7 +68,7 @@ mod parse_impls {
             'b: 'c,
             'b: 'a,
         {
-            let (i, (left_bracket, verbatim, right_bracket)) =
+            let (i, (left_delim, verbatim, right_delim)) =
                 // FIXME: Handle nested braces, e.g. [before[action]after]
                 (tuple((char('['), is_not("]"), char(']')))(i)).map(
                     |(i, (left_bracket, verbatim, right_bracket))| {
@@ -85,9 +85,9 @@ mod parse_impls {
             Ok((
                 i,
                 Self {
-                    left_bracket,
+                    left_delim,
                     verbatim,
-                    right_bracket,
+                    right_delim,
                 },
             ))
         }
@@ -99,7 +99,7 @@ mod parse_impls {
             'b: 'c,
             'b: 'a,
         {
-            let (i, (left_brace, verbatim, right_brace)) =
+            let (i, (left_delim, verbatim, right_delim)) =
                 // FIXME: Handle nested braces, e.g. {before{action}after}
                 (tuple((char('{'), is_not("}"), char('}')))(i)).map(
                     |(i, (left_brace, verbatim, right_brace))| {
@@ -112,9 +112,9 @@ mod parse_impls {
             Ok((
                 i,
                 Self {
-                    left_brace,
+                    left_delim,
                     verbatim,
-                    right_brace,
+                    right_delim,
                 },
             ))
         }

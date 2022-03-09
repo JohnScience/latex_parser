@@ -69,12 +69,12 @@ mod tests {
         match &arbitrary_cmd.arguments[0] {
             Optional(_) => panic!("arbitrary_cmd.arguments[0] is not Required variant"),
             Required(required_argument) => {
-                assert_eq!(required_argument.left_brace.0, '{');
+                assert_eq!(required_argument.left_delim.0, '{');
                 assert_eq!(
                     required_argument.verbatim,
                     "Command without optional arguments"
                 );
-                assert_eq!(required_argument.right_brace.0, '}');
+                assert_eq!(required_argument.right_delim.0, '}');
             }
         }
 
@@ -114,12 +114,12 @@ mod tests {
         assert_eq!(optional_arguments.len(), 0);
         assert_eq!(required_arguments.len(), 2);
 
-        assert_eq!(required_arguments[0].left_brace.0, '{');
+        assert_eq!(required_arguments[0].left_delim.0, '{');
         assert_eq!(required_arguments[0].verbatim, "2");
-        assert_eq!(required_arguments[0].right_brace.0, '}');
-        assert_eq!(required_arguments[1].left_brace.0, '{');
+        assert_eq!(required_arguments[0].right_delim.0, '}');
+        assert_eq!(required_arguments[1].left_delim.0, '{');
         assert_eq!(required_arguments[1].verbatim, "5");
-        assert_eq!(required_arguments[1].right_brace.0, '}');
+        assert_eq!(required_arguments[1].right_delim.0, '}');
         assert_eq!(i, "");
     }
 }
