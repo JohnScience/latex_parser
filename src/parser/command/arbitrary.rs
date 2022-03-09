@@ -58,7 +58,7 @@ mod parse_impls {
         RightBrace, RightBracket,
     };
     use nom::{
-        branch::alt, bytes::complete::is_not, character::complete::char, multi::many0,
+        branch::alt, bytes::complete::is_not, multi::many0,
         sequence::tuple, IResult,
     };
 
@@ -70,18 +70,7 @@ mod parse_impls {
         {
             let (i, (left_delim, verbatim, right_delim)) =
                 // FIXME: Handle nested braces, e.g. [before[action]after]
-                (tuple((char('['), is_not("]"), char(']')))(i)).map(
-                    |(i, (left_bracket, verbatim, right_bracket))| {
-                        (
-                            i,
-                            (
-                                LeftBracket(left_bracket),
-                                verbatim,
-                                RightBracket(right_bracket),
-                            ),
-                        )
-                    },
-                )?;
+                (tuple((LeftBracket::parse, is_not("]"), RightBracket::parse))(i))?;
             Ok((
                 i,
                 Self {
@@ -101,14 +90,7 @@ mod parse_impls {
         {
             let (i, (left_delim, verbatim, right_delim)) =
                 // FIXME: Handle nested braces, e.g. {before{action}after}
-                (tuple((char('{'), is_not("}"), char('}')))(i)).map(
-                    |(i, (left_brace, verbatim, right_brace))| {
-                        (
-                            i,
-                            (LeftBrace(left_brace), verbatim, RightBrace(right_brace)),
-                        )
-                    },
-                )?;
+                (tuple((LeftBrace::parse, is_not("}"), RightBrace::parse))(i))?;
             Ok((
                 i,
                 Self {
