@@ -29,11 +29,8 @@ where
         'b: 'c,
         'b: 'a,
     {
-        let (i, (backslash, cmd_name, arguments)) = tuple((
-            Backslash::parse,
-            A::parse_before,
-            A::parse,
-        ))(i)?;
+        let (i, (backslash, cmd_name, arguments)) =
+            tuple((Backslash::parse, A::parse_before, A::parse))(i)?;
         Ok((
             i,
             Self {

@@ -63,7 +63,10 @@ mod args_impls {
 }
 
 mod parse_impls {
-    use crate::{tokens::{CharToken, DelimPair}, parser::ParseBefore};
+    use crate::{
+        parser::ParseBefore,
+        tokens::{CharToken, DelimPair},
+    };
 
     use super::{ArbitraryArg, ArbitraryDelimitedArg, Parse};
     use nom::{branch::alt, multi::many0, sequence::tuple, IResult};
@@ -120,19 +123,19 @@ mod parse_before_impls {
 
     use crate::{
         parser::ParseBefore,
-        tokens::{DelimPair, CharToken, LeftBrace, LeftBracket},
+        tokens::{CharToken, DelimPair, LeftBrace, LeftBracket},
     };
 
     use super::{ArbitraryArg, ArbitraryDelimitedArg};
 
-    impl<'a,C> ParseBefore<'a> for C
+    impl<'a, C> ParseBefore<'a> for C
     where
-        C: CharToken
+        C: CharToken,
     {
         fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
         where
             'b: 'c,
-            'b: 'a
+            'b: 'a,
         {
             is_not(C::CHAR_STR)(i)
         }
@@ -145,8 +148,9 @@ mod parse_before_impls {
     {
         fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
         where
-                'b: 'c,
-                'b: 'a {
+            'b: 'c,
+            'b: 'a,
+        {
             D::Left::parse_before(i)
         }
     }
@@ -154,9 +158,10 @@ mod parse_before_impls {
     impl<'a> ParseBefore<'a> for ArbitraryArg<'a> {
         fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
         where
-                'b: 'c,
-                'b: 'a {
-                take_till1(|c| c == LeftBrace::CHAR || c == LeftBracket::CHAR)(i)
+            'b: 'c,
+            'b: 'a,
+        {
+            take_till1(|c| c == LeftBrace::CHAR || c == LeftBracket::CHAR)(i)
         }
     }
 }
