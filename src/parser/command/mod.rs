@@ -1,11 +1,13 @@
 use crate::parser::Parse;
 
 use crate::tokens::Backslash;
-use nom::{bytes::complete::take_till1, sequence::tuple, IResult};
+use nom::{sequence::tuple, IResult};
 
 pub mod arbitrary;
 
 pub use arbitrary::ArbitraryCommand;
+
+use super::ParseBefore;
 
 pub struct Command<'a, A>
 where
@@ -16,7 +18,7 @@ where
     pub arguments: A,
 }
 
-pub trait Args<'a>: Parse<'a> {}
+pub trait Args<'a>: Parse<'a> + ParseBefore<'a> {}
 
 impl<'a, A> Parse<'a> for Command<'a, A>
 where
@@ -29,8 +31,7 @@ where
     {
         let (i, (backslash, cmd_name, arguments)) = tuple((
             Backslash::parse,
-            // TODO: Make generic via `A::parse_before`
-            take_till1(|c| c == '[' || c == '{'),
+            A::parse_before,
             A::parse,
         ))(i)?;
         Ok((

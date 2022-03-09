@@ -45,7 +45,7 @@ impl<'a> ArbitraryArg<'a> {
 
 mod args_impls {
     use crate::{
-        parser::Parse,
+        parser::{Parse, ParseBefore},
         tokens::{CharToken, DelimPair},
     };
 
@@ -54,8 +54,8 @@ mod args_impls {
     impl<'a, D> Args<'a> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: Parse<'a>,
-        D::Right: Parse<'a> + CharToken,
+        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
+        D::Right: ParseBefore<'a> + CharToken + Parse<'a>,
     {
     }
     impl<'a> Args<'a> for ArbitraryArg<'a> {}
@@ -63,16 +63,16 @@ mod args_impls {
 }
 
 mod parse_impls {
-    use crate::tokens::{CharToken, DelimPair};
+    use crate::{tokens::{CharToken, DelimPair}, parser::ParseBefore};
 
     use super::{ArbitraryArg, ArbitraryDelimitedArg, Parse};
-    use nom::{branch::alt, bytes::complete::is_not, multi::many0, sequence::tuple, IResult};
+    use nom::{branch::alt, multi::many0, sequence::tuple, IResult};
 
     impl<'a, D> Parse<'a> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
         D::Left: Parse<'a>,
-        D::Right: Parse<'a> + CharToken,
+        D::Right: Parse<'a> + ParseBefore<'a> + CharToken,
     {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
@@ -81,7 +81,7 @@ mod parse_impls {
         {
             let (i, (left_delim, verbatim, right_delim)) =
                 // FIXME: Handle nested braces, e.g. [before[action]after]
-                (tuple((D::Left::parse, is_not(D::Right::CHAR_STR), D::Right::parse))(i))?;
+                (tuple((D::Left::parse, D::Right::parse_before, D::Right::parse))(i))?;
             Ok((
                 i,
                 Self {
@@ -111,6 +111,52 @@ mod parse_impls {
             'b: 'a,
         {
             many0(ArbitraryArg::parse)(i)
+        }
+    }
+}
+
+mod parse_before_impls {
+    use nom::bytes::complete::{is_not, take_till1};
+
+    use crate::{
+        parser::ParseBefore,
+        tokens::{DelimPair, CharToken, LeftBrace, LeftBracket},
+    };
+
+    use super::{ArbitraryArg, ArbitraryDelimitedArg};
+
+    impl<'a,C> ParseBefore<'a> for C
+    where
+        C: CharToken
+    {
+        fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
+        where
+            'b: 'c,
+            'b: 'a
+        {
+            is_not(C::CHAR_STR)(i)
+        }
+    }
+
+    impl<'a, D> ParseBefore<'a> for ArbitraryDelimitedArg<'a, D>
+    where
+        D: DelimPair,
+        D::Left: CharToken + ParseBefore<'a>,
+    {
+        fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
+        where
+                'b: 'c,
+                'b: 'a {
+            D::Left::parse_before(i)
+        }
+    }
+
+    impl<'a> ParseBefore<'a> for ArbitraryArg<'a> {
+        fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
+        where
+                'b: 'c,
+                'b: 'a {
+                take_till1(|c| c == LeftBrace::CHAR || c == LeftBracket::CHAR)(i)
         }
     }
 }
