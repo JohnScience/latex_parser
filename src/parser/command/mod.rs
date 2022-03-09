@@ -1,7 +1,7 @@
 use crate::parser::Parse;
 
 use crate::tokens::Backslash;
-use nom::{bytes::complete::take_till1, character::complete::char, sequence::pair, IResult};
+use nom::{bytes::complete::take_till1, sequence::tuple, IResult};
 
 pub mod arbitrary;
 
@@ -27,9 +27,11 @@ where
         'b: 'c,
         'b: 'a,
     {
-        let (i, (backslash, cmd_name)) = pair(char('\\'), take_till1(|c| c == '[' || c == '{'))(i)
-            .map(|(i, (backslash, cmd_name))| (i, (Backslash(backslash), cmd_name)))?;
-        let (i, arguments) = A::parse(i)?;
+        let (i, (backslash, cmd_name, arguments)) = tuple((
+            Backslash::parse,
+            take_till1(|c| c == '[' || c == '{'),
+            A::parse,
+        ))(i)?;
         Ok((
             i,
             Self {

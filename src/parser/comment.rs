@@ -2,11 +2,7 @@ use crate::{
     parser::Parse,
     tokens::{LineEnding, PercentSign},
 };
-use nom::{
-    character::complete::{char, not_line_ending},
-    sequence::tuple,
-    IResult,
-};
+use nom::{character::complete::not_line_ending, sequence::tuple, IResult};
 
 pub struct Comment<'a> {
     pub percent_sign: PercentSign,
@@ -20,12 +16,15 @@ impl<'a> Parse<'a> for Comment<'a> {
         'b: 'c,
         'b: 'a,
     {
-        let (i, (percent_sign, text, opt_line_ending)) =
-            tuple((char('%'), not_line_ending, Option::<LineEnding>::parse))(i)?;
+        let (i, (percent_sign, text, opt_line_ending)) = tuple((
+            PercentSign::parse,
+            not_line_ending,
+            Option::<LineEnding>::parse,
+        ))(i)?;
         Ok((
             i,
             Comment {
-                percent_sign: PercentSign(percent_sign),
+                percent_sign,
                 text,
                 opt_line_ending,
             },
