@@ -29,6 +29,7 @@ where
     {
         let (i, (backslash, cmd_name, arguments)) = tuple((
             Backslash::parse,
+            // TODO: Make generic via `A::parse_before`
             take_till1(|c| c == '[' || c == '{'),
             A::parse,
         ))(i)?;
