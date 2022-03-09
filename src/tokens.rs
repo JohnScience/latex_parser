@@ -5,7 +5,7 @@ use nom::{
     IResult,
 };
 
-pub trait CharacterToken {
+pub trait CharToken {
     const CHAR: char;
 }
 
@@ -13,7 +13,7 @@ macro_rules! declare_char_token_ty {
     ($t:ident[$lit:literal]) => {
         pub struct $t(pub char);
 
-        impl CharacterToken for $t {
+        impl CharToken for $t {
             const CHAR: char = $lit;
         }
 
