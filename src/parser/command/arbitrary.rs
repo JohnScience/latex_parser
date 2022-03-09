@@ -26,7 +26,7 @@ pub type ArbitraryCommand<'a> = Command<'a, Vec<ArbitraryArg<'a>>>;
 
 // TODO: generate the code below using e.g. stateful macros
 impl<'a> ArbitraryArg<'a> {
-    fn parse_optional<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
+    fn parse_bracketed<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
         'b: 'c,
         'b: 'a,
@@ -34,7 +34,7 @@ impl<'a> ArbitraryArg<'a> {
         ArbitraryBracketedArg::parse(i).map(|(i, arg)| (i, ArbitraryArg::Optional(arg)))
     }
 
-    fn parse_required<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
+    fn parse_braced<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
         'b: 'c,
         'b: 'a,
@@ -100,7 +100,7 @@ mod parse_impls {
             'b: 'a,
         {
             // TODO: generate the code below using e.g. stateful macros
-            alt((Self::parse_optional, Self::parse_required))(i)
+            alt((Self::parse_bracketed, Self::parse_braced))(i)
         }
     }
 
