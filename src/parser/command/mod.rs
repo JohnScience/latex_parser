@@ -28,7 +28,7 @@ where
         'b: 'a,
     {
         let (i, (backslash, cmd_name)) = pair(char('\\'), take_till1(|c| c == '[' || c == '{'))(i)
-            .map(|(i, (backslash, cmd_name))| ((i, (Backslash(backslash), cmd_name))))?;
+            .map(|(i, (backslash, cmd_name))| (i, (Backslash(backslash), cmd_name)))?;
         let (i, arguments) = A::parse(i)?;
         Ok((
             i,
