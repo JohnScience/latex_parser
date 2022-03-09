@@ -9,39 +9,58 @@ mod tests {
 
     #[test]
     fn parse_comment() {
-        assert_eq!(
-            parser::comment::comment::<()>("% latex comment"),
-            Ok(("", " latex comment"))
-        );
+        use parser::comment::Comment;
+
+        let (i, comment) = Comment::parse("% latex comment").unwrap();
+        let Comment {
+            percent_sign,
+            text,
+            opt_line_ending,
+        } = comment;
+        assert_eq!(percent_sign.0, '%');
+        assert_eq!(text, " latex comment");
+        matches!(opt_line_ending, None);
+
+        assert_eq!(i, "");
     }
 
     #[test]
     fn skip_comment() {
-        assert_eq!(
-            value((),parser::comment::comment::<()>)("% latex comment"),
-            Ok(("", ()))
-        );
+        use parser::comment::Comment;
+
+        assert_eq!(value((), Comment::parse)("% latex comment"), Ok(("", ())));
     }
 
     #[test]
     fn parse_comment_in_multiline() {
-        assert_eq!(
-            parser::comment::comment::<()>(
-                "% latex comment\n\
-                \\view{...}"
-            ),
-            Ok(("\\view{...}", " latex comment"))
-        );
+        use parser::comment::Comment;
+
+        let (i, comment) = Comment::parse(
+            "% latex comment\n\
+            \\view{...}",
+        )
+        .unwrap();
+        let Comment {
+            percent_sign,
+            text,
+            opt_line_ending,
+        } = comment;
+        assert_eq!(percent_sign.0, '%');
+        assert_eq!(text, " latex comment");
+        assert_eq!(opt_line_ending.map(|newtype| newtype.0), Some("\n"));
+
+        assert_eq!(i, "\\view{...}");
     }
 
     #[test]
     fn parse_arbitrary_command_without_optional_arg() {
-        use crate::parser::command::arbitrary::ArbitraryArg::{Required, Optional};
+        use crate::parser::command::arbitrary::ArbitraryArg::{Optional, Required};
 
         let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse(
             "\\textbf{Command without optional arguments} % bold text\n\
-            Next line"
-        ).unwrap();
+            Next line",
+        )
+        .unwrap();
 
         assert_eq!(arbitrary_cmd.backslash.0, '\\');
         assert_eq!(arbitrary_cmd.cmd_name, "textbf");
@@ -51,7 +70,10 @@ mod tests {
             Optional(_) => panic!("arbitrary_cmd.arguments[0] is not Required variant"),
             Required(required_argument) => {
                 assert_eq!(required_argument.left_brace.0, '{');
-                assert_eq!(required_argument.verbatim, "Command without optional arguments");
+                assert_eq!(
+                    required_argument.verbatim,
+                    "Command without optional arguments"
+                );
                 assert_eq!(required_argument.right_brace.0, '}');
             }
         }
@@ -65,24 +87,28 @@ mod tests {
 
     #[test]
     fn parse_frac() {
-        use crate::parser::command::arbitrary::{ArbitraryBracedArg, ArbitraryBracketedArg, ArbitraryArg::{Required, Optional}};
+        use crate::parser::command::arbitrary::{
+            ArbitraryArg::{Optional, Required},
+            ArbitraryBracedArg, ArbitraryBracketedArg,
+        };
 
-        let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse(
-            "\\frac{2}{5}"
-        ).unwrap();
+        let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse("\\frac{2}{5}").unwrap();
         assert_eq!(arbitrary_cmd.backslash.0, '\\');
         assert_eq!(arbitrary_cmd.cmd_name, "frac");
         assert_eq!(arbitrary_cmd.arguments.len(), 2);
 
-        let (optional_arguments, required_arguments)
-            = arbitrary_cmd.arguments.into_iter()
-            .fold((Vec::<ArbitraryBracketedArg>::new(), Vec::<ArbitraryBracedArg>::new()), |(mut opt_args, mut req_args),arg| {
+        let (optional_arguments, required_arguments) = arbitrary_cmd.arguments.into_iter().fold(
+            (
+                Vec::<ArbitraryBracketedArg>::new(),
+                Vec::<ArbitraryBracedArg>::new(),
+            ),
+            |(mut opt_args, mut req_args), arg| {
                 match arg {
-                    Required(req_arg) => { req_args.push(req_arg) },
-                    Optional(opt_arg) => { opt_args.push(opt_arg) },
+                    Required(req_arg) => req_args.push(req_arg),
+                    Optional(opt_arg) => opt_args.push(opt_arg),
                 };
                 (opt_args, req_args)
-            }
+            },
         );
 
         assert_eq!(optional_arguments.len(), 0);
@@ -94,6 +120,6 @@ mod tests {
         assert_eq!(required_arguments[1].left_brace.0, '{');
         assert_eq!(required_arguments[1].verbatim, "5");
         assert_eq!(required_arguments[1].right_brace.0, '}');
-        assert_eq!(i,"");
+        assert_eq!(i, "");
     }
 }

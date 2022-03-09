@@ -1,4 +1,4 @@
-use super::{Command, Args};
+use super::{Args, Command};
 use crate::{
     parser::Parse,
     tokens::{LeftBrace, LeftBracket, RightBrace, RightBracket},
@@ -19,34 +19,32 @@ pub struct ArbitraryBracedArg<'a> {
 
 pub enum ArbitraryArg<'a> {
     Optional(ArbitraryBracketedArg<'a>),
-    Required(ArbitraryBracedArg<'a>),   
+    Required(ArbitraryBracedArg<'a>),
 }
 
 pub type ArbitraryCommand<'a> = Command<'a, Vec<ArbitraryArg<'a>>>;
 
 // TODO: generate the code below using e.g. stateful macros
 impl<'a> ArbitraryArg<'a> {
-    fn parse_optional<'b,'c>(i: &'b str) -> IResult<&'c str, Self>
+    fn parse_optional<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
         'b: 'c,
-        'b: 'a 
+        'b: 'a,
     {
-        ArbitraryBracketedArg::parse(i)
-            .map(|(i, arg)| (i, ArbitraryArg::Optional(arg)))
+        ArbitraryBracketedArg::parse(i).map(|(i, arg)| (i, ArbitraryArg::Optional(arg)))
     }
 
-    fn parse_required<'b,'c>(i: &'b str) -> IResult<&'c str, Self>
+    fn parse_required<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
         'b: 'c,
-        'b: 'a 
+        'b: 'a,
     {
-        ArbitraryBracedArg::parse(i)
-            .map(|(i, arg)| (i, ArbitraryArg::Required(arg)))
+        ArbitraryBracedArg::parse(i).map(|(i, arg)| (i, ArbitraryArg::Required(arg)))
     }
 }
 
 mod args_impls {
-    use super::{Args, ArbitraryBracketedArg, ArbitraryBracedArg, ArbitraryArg};
+    use super::{ArbitraryArg, ArbitraryBracedArg, ArbitraryBracketedArg, Args};
 
     impl<'a> Args<'a> for ArbitraryBracketedArg<'a> {}
     impl<'a> Args<'a> for ArbitraryBracedArg<'a> {}
@@ -55,8 +53,14 @@ mod args_impls {
 }
 
 mod parse_impls {
-    use super::{Parse, ArbitraryBracketedArg, ArbitraryBracedArg, ArbitraryArg, LeftBrace, LeftBracket, RightBrace, RightBracket};
-    use nom::{bytes::complete::is_not, character::complete::char, sequence::tuple, IResult, multi::many0, branch::alt};
+    use super::{
+        ArbitraryArg, ArbitraryBracedArg, ArbitraryBracketedArg, LeftBrace, LeftBracket, Parse,
+        RightBrace, RightBracket,
+    };
+    use nom::{
+        branch::alt, bytes::complete::is_not, character::complete::char, multi::many0,
+        sequence::tuple, IResult,
+    };
 
     impl<'a> Parse<'a> for ArbitraryBracketedArg<'a> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
@@ -94,20 +98,15 @@ mod parse_impls {
             'b: 'c,
             'b: 'a,
         {
-            let (i, (left_brace, verbatim, right_brace))
-                = (tuple((char('{'), is_not("}"), char('}')))(
-                    i,
-                ))
-                .map(|(i, (left_brace, verbatim, right_brace))| {
-                    (
-                        i,
+            let (i, (left_brace, verbatim, right_brace)) =
+                (tuple((char('{'), is_not("}"), char('}')))(i)).map(
+                    |(i, (left_brace, verbatim, right_brace))| {
                         (
-                            LeftBrace(left_brace),
-                            verbatim,
-                            RightBrace(right_brace),
-                        ),
-                    )
-                })?;
+                            i,
+                            (LeftBrace(left_brace), verbatim, RightBrace(right_brace)),
+                        )
+                    },
+                )?;
             Ok((
                 i,
                 Self {
@@ -122,8 +121,9 @@ mod parse_impls {
     impl<'a> Parse<'a> for ArbitraryArg<'a> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
-                'b: 'c,
-                'b: 'a {
+            'b: 'c,
+            'b: 'a,
+        {
             // TODO: generate the code below using e.g. stateful macros
             alt((Self::parse_optional, Self::parse_required))(i)
         }
@@ -133,7 +133,7 @@ mod parse_impls {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,
-            'b: 'a
+            'b: 'a,
         {
             many0(ArbitraryArg::parse)(i)
         }
