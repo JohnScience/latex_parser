@@ -69,6 +69,7 @@ mod parse_impls {
             'b: 'a,
         {
             let (i, (left_bracket, verbatim, right_bracket)) =
+                // FIXME: Handle nested braces, e.g. [before[action]after]
                 (tuple((char('['), is_not("]"), char(']')))(i)).map(
                     |(i, (left_bracket, verbatim, right_bracket))| {
                         (
