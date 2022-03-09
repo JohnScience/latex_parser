@@ -5,9 +5,17 @@ use nom::{
     IResult,
 };
 
+pub trait CharacterToken {
+    const CHAR: char;
+}
+
 macro_rules! declare_char_token_ty {
     ($t:ident[$lit:literal]) => {
         pub struct $t(pub char);
+
+        impl CharacterToken for $t {
+            const CHAR: char = $lit;
+        }
 
         impl<'a> Parse<'a> for $t {
             fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
@@ -22,7 +30,7 @@ macro_rules! declare_char_token_ty {
 
         impl Default for $t {
             fn default() -> Self {
-                Self($lit)
+                Self(Self::CHAR)
             }
         }
     };
