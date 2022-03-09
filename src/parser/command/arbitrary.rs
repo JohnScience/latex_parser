@@ -1,13 +1,13 @@
 use super::{Args, Command};
 use crate::{
     parser::Parse,
-    tokens::{LeftBrace, LeftBracket, RightBrace, RightBracket, DelimPair, Brackets, Braces},
+    tokens::{Braces, Brackets, DelimPair},
 };
 use nom::IResult;
 
 pub struct ArbitraryDelimitedArg<'a, D>
 where
-    D: DelimPair
+    D: DelimPair,
 {
     pub left_delim: D::Left,
     pub verbatim: &'a str,
@@ -44,25 +44,36 @@ impl<'a> ArbitraryArg<'a> {
 }
 
 mod args_impls {
-    use super::{ArbitraryArg, ArbitraryBracedArg, ArbitraryBracketedArg, Args};
+    use crate::{
+        parser::Parse,
+        tokens::{CharToken, DelimPair},
+    };
 
-    impl<'a> Args<'a> for ArbitraryBracketedArg<'a> {}
-    impl<'a> Args<'a> for ArbitraryBracedArg<'a> {}
+    use super::{ArbitraryArg, ArbitraryDelimitedArg, Args};
+
+    impl<'a, D> Args<'a> for ArbitraryDelimitedArg<'a, D>
+    where
+        D: DelimPair,
+        D::Left: Parse<'a>,
+        D::Right: Parse<'a> + CharToken,
+    {
+    }
     impl<'a> Args<'a> for ArbitraryArg<'a> {}
     impl<'a> Args<'a> for Vec<ArbitraryArg<'a>> {}
 }
 
 mod parse_impls {
-    use super::{
-        ArbitraryArg, ArbitraryBracedArg, ArbitraryBracketedArg, LeftBrace, LeftBracket, Parse,
-        RightBrace, RightBracket,
-    };
-    use nom::{
-        branch::alt, bytes::complete::is_not, multi::many0,
-        sequence::tuple, IResult,
-    };
+    use crate::tokens::{CharToken, DelimPair};
 
-    impl<'a> Parse<'a> for ArbitraryBracketedArg<'a> {
+    use super::{ArbitraryArg, ArbitraryDelimitedArg, Parse};
+    use nom::{branch::alt, bytes::complete::is_not, multi::many0, sequence::tuple, IResult};
+
+    impl<'a, D> Parse<'a> for ArbitraryDelimitedArg<'a, D>
+    where
+        D: DelimPair,
+        D::Left: Parse<'a>,
+        D::Right: Parse<'a> + CharToken,
+    {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,
@@ -70,27 +81,7 @@ mod parse_impls {
         {
             let (i, (left_delim, verbatim, right_delim)) =
                 // FIXME: Handle nested braces, e.g. [before[action]after]
-                (tuple((LeftBracket::parse, is_not("]"), RightBracket::parse))(i))?;
-            Ok((
-                i,
-                Self {
-                    left_delim,
-                    verbatim,
-                    right_delim,
-                },
-            ))
-        }
-    }
-
-    impl<'a> Parse<'a> for ArbitraryBracedArg<'a> {
-        fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
-        where
-            'b: 'c,
-            'b: 'a,
-        {
-            let (i, (left_delim, verbatim, right_delim)) =
-                // FIXME: Handle nested braces, e.g. {before{action}after}
-                (tuple((LeftBrace::parse, is_not("}"), RightBrace::parse))(i))?;
+                (tuple((D::Left::parse, is_not(D::Right::CHAR_STR), D::Right::parse))(i))?;
             Ok((
                 i,
                 Self {

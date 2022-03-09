@@ -7,6 +7,7 @@ use nom::{
 
 pub trait CharToken {
     const CHAR: char;
+    const CHAR_STR: &'static str;
 }
 
 macro_rules! declare_char_token_ty {
@@ -15,6 +16,7 @@ macro_rules! declare_char_token_ty {
 
         impl CharToken for $t {
             const CHAR: char = $lit;
+            const CHAR_STR: &'static str = stringify!($lit);
         }
 
         impl<'a> Parse<'a> for $t {
