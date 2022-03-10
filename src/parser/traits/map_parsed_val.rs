@@ -2,40 +2,38 @@
 
 use nom::IResult;
 
-pub trait MapParsedValInTuple<'a,T>
-    where
-        T: super::Parse<'a>
+pub trait MapParsedValInTuple<'a, T>
+where
+    T: super::Parse<'a>,
 {
-    fn map_parsed_val<'b,U,F: FnOnce(T) -> U>(self,f: F) -> (&'b str, U)
+    fn map_parsed_val<'b, U, F: FnOnce(T) -> U>(self, f: F) -> (&'b str, U)
     where
         'a: 'b;
 }
 
-impl<'a,T> MapParsedValInTuple<'a,T> for (&'a str,T)
-    where
-        T: super::Parse<'a>
+impl<'a, T> MapParsedValInTuple<'a, T> for (&'a str, T)
+where
+    T: super::Parse<'a>,
 {
-    fn map_parsed_val<'b,U,F: FnOnce(T) -> U>(self,f: F) -> (&'b str, U)
+    fn map_parsed_val<'b, U, F: FnOnce(T) -> U>(self, f: F) -> (&'b str, U)
     where
-        'a: 'b
+        'a: 'b,
     {
-        (self.0,f(self.1))
+        (self.0, f(self.1))
     }
 }
 
-pub trait MapParsedValInResult<'a,T>
-{
-    fn map_parsed_val<'b,U,F: FnOnce(T) -> U>(self,f: F) -> IResult<&'b str, U>
+pub trait MapParsedValInResult<'a, T> {
+    fn map_parsed_val<'b, U, F: FnOnce(T) -> U>(self, f: F) -> IResult<&'b str, U>
     where
         'a: 'b;
 }
 
-impl<'a,T> MapParsedValInResult<'a,T> for IResult<&'a str, T>
-{
-    fn map_parsed_val<'b,U,F: FnOnce(T) -> U>(self,f: F) -> IResult<&'b str, U>
+impl<'a, T> MapParsedValInResult<'a, T> for IResult<&'a str, T> {
+    fn map_parsed_val<'b, U, F: FnOnce(T) -> U>(self, f: F) -> IResult<&'b str, U>
     where
-        'a: 'b
+        'a: 'b,
     {
-        self.map(|(i, parsed_val)| (i,f(parsed_val)))
+        self.map(|(i, parsed_val)| (i, f(parsed_val)))
     }
 }

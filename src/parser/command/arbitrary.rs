@@ -1,6 +1,6 @@
 use super::{Args, Command};
 use crate::{
-    parser::traits::{Parse, MapParsedValInResult, FromTuple},
+    parser::traits::{FromTuple, MapParsedValInResult, Parse},
     tokens::{Braces, Brackets, DelimPair},
 };
 use nom::IResult;
@@ -43,12 +43,16 @@ impl<'a> ArbitraryArg<'a> {
     }
 }
 
-impl<'a, D> FromTuple<(D::Left,&'a str, D::Right)> for ArbitraryDelimitedArg<'a, D>
-    where
-        D: DelimPair,
+impl<'a, D> FromTuple<(D::Left, &'a str, D::Right)> for ArbitraryDelimitedArg<'a, D>
+where
+    D: DelimPair,
 {
-    fn from_tuple((left_delim,verbatim,right_delim): (D::Left,&'a str, D::Right)) -> Self {
-        Self { left_delim, verbatim, right_delim }
+    fn from_tuple((left_delim, verbatim, right_delim): (D::Left, &'a str, D::Right)) -> Self {
+        Self {
+            left_delim,
+            verbatim,
+            right_delim,
+        }
     }
 }
 
@@ -77,7 +81,7 @@ mod parse_impls {
         tokens::{CharToken, DelimPair},
     };
 
-    use super::{ArbitraryArg, ArbitraryDelimitedArg, Parse, FromTuple, MapParsedValInResult};
+    use super::{ArbitraryArg, ArbitraryDelimitedArg, FromTuple, MapParsedValInResult, Parse};
     use nom::{branch::alt, multi::many0, sequence::tuple, IResult};
 
     impl<'a, D> Parse<'a> for ArbitraryDelimitedArg<'a, D>
@@ -92,7 +96,8 @@ mod parse_impls {
             'b: 'a,
         {
             // FIXME: Handle nested braces, e.g. [before[action]after]
-            (tuple((D::Left::parse, D::Right::parse_before, D::Right::parse))(i)).map_parsed_val(Self::from_tuple)
+            (tuple((D::Left::parse, D::Right::parse_before, D::Right::parse))(i))
+                .map_parsed_val(Self::from_tuple)
         }
     }
 
