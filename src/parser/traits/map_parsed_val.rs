@@ -24,8 +24,6 @@ impl<'a,T> MapParsedValInTuple<'a,T> for (&'a str,T)
 }
 
 pub trait MapParsedValInResult<'a,T>
-    where
-        T: super::Parse<'a>
 {
     fn map_parsed_val<'b,U,F: FnOnce(T) -> U>(self,f: F) -> IResult<&'b str, U>
     where
@@ -33,13 +31,11 @@ pub trait MapParsedValInResult<'a,T>
 }
 
 impl<'a,T> MapParsedValInResult<'a,T> for IResult<&'a str, T>
-    where
-        T: super::Parse<'a>
 {
     fn map_parsed_val<'b,U,F: FnOnce(T) -> U>(self,f: F) -> IResult<&'b str, U>
     where
         'a: 'b
     {
-        self.map(|parsed_pair| parsed_pair.map_parsed_val(f))
+        self.map(|(i, parsed_val)| (i,f(parsed_val)))
     }
 }

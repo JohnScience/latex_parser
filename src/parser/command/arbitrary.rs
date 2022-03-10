@@ -1,8 +1,7 @@
 use super::{Args, Command};
 use crate::{
-    parser::Parse,
+    parser::{Parse, MapParsedValInResult, FromTuple},
     tokens::{Braces, Brackets, DelimPair},
-    util::MapRightResult,
 };
 use nom::IResult;
 
@@ -32,7 +31,7 @@ impl<'a> ArbitraryArg<'a> {
         'b: 'c,
         'b: 'a,
     {
-        ArbitraryBracketedArg::parse(i).map_right(ArbitraryArg::Optional)
+        ArbitraryBracketedArg::parse(i).map_parsed_val(ArbitraryArg::Optional)
     }
 
     fn parse_braced<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
@@ -40,7 +39,16 @@ impl<'a> ArbitraryArg<'a> {
         'b: 'c,
         'b: 'a,
     {
-        ArbitraryBracedArg::parse(i).map_right(ArbitraryArg::Required)
+        ArbitraryBracedArg::parse(i).map_parsed_val(ArbitraryArg::Required)
+    }
+}
+
+impl<'a, D> FromTuple<(D::Left,&'a str, D::Right)> for ArbitraryDelimitedArg<'a, D>
+    where
+        D: DelimPair,
+{
+    fn from_tuple((left_delim,verbatim,right_delim): (D::Left,&'a str, D::Right)) -> Self {
+        Self { left_delim, verbatim, right_delim }
     }
 }
 
@@ -69,7 +77,7 @@ mod parse_impls {
         tokens::{CharToken, DelimPair},
     };
 
-    use super::{ArbitraryArg, ArbitraryDelimitedArg, Parse};
+    use super::{ArbitraryArg, ArbitraryDelimitedArg, Parse, FromTuple, MapParsedValInResult};
     use nom::{branch::alt, multi::many0, sequence::tuple, IResult};
 
     impl<'a, D> Parse<'a> for ArbitraryDelimitedArg<'a, D>
@@ -83,17 +91,8 @@ mod parse_impls {
             'b: 'c,
             'b: 'a,
         {
-            let (i, (left_delim, verbatim, right_delim)) =
-                // FIXME: Handle nested braces, e.g. [before[action]after]
-                (tuple((D::Left::parse, D::Right::parse_before, D::Right::parse))(i))?;
-            Ok((
-                i,
-                Self {
-                    left_delim,
-                    verbatim,
-                    right_delim,
-                },
-            ))
+            // FIXME: Handle nested braces, e.g. [before[action]after]
+            (tuple((D::Left::parse, D::Right::parse_before, D::Right::parse))(i)).map_parsed_val(Self::from_tuple)
         }
     }
 
