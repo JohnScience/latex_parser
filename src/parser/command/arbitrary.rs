@@ -2,6 +2,7 @@ use super::{Args, Command};
 use crate::{
     parser::Parse,
     tokens::{Braces, Brackets, DelimPair},
+    util::MapRightResult,
 };
 use nom::IResult;
 
@@ -31,7 +32,7 @@ impl<'a> ArbitraryArg<'a> {
         'b: 'c,
         'b: 'a,
     {
-        ArbitraryBracketedArg::parse(i).map(|(i, arg)| (i, ArbitraryArg::Optional(arg)))
+        ArbitraryBracketedArg::parse(i).map_right(ArbitraryArg::Optional)
     }
 
     fn parse_braced<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
@@ -39,7 +40,7 @@ impl<'a> ArbitraryArg<'a> {
         'b: 'c,
         'b: 'a,
     {
-        ArbitraryBracedArg::parse(i).map(|(i, arg)| (i, ArbitraryArg::Required(arg)))
+        ArbitraryBracedArg::parse(i).map_right(ArbitraryArg::Required)
     }
 }
 
