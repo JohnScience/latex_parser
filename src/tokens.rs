@@ -1,4 +1,4 @@
-use crate::parser::Parse;
+use crate::parser::traits::Parse;
 use core::default::Default;
 use nom::{
     character::complete::{char, line_ending},

@@ -1,5 +1,5 @@
 use crate::{
-    parser::Parse,
+    parser::traits::Parse,
     tokens::{LineEnding, PercentSign},
 };
 use nom::{character::complete::not_line_ending, sequence::tuple, IResult};

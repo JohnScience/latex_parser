@@ -5,7 +5,7 @@ pub mod tokens;
 mod tests {
     use nom::combinator::value;
 
-    use crate::parser::{self, Parse};
+    use crate::parser::{self, traits::Parse};
 
     #[test]
     fn parse_comment() {

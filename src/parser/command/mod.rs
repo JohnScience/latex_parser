@@ -1,4 +1,4 @@
-use crate::parser::Parse;
+use crate::parser::traits::Parse;
 
 use crate::tokens::Backslash;
 use nom::{sequence::tuple, IResult};
@@ -7,7 +7,7 @@ pub mod arbitrary;
 
 pub use arbitrary::ArbitraryCommand;
 
-use super::ParseBefore;
+use super::traits::ParseBefore;
 
 pub struct Command<'a, A>
 where

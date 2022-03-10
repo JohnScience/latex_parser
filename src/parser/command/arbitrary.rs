@@ -1,6 +1,6 @@
 use super::{Args, Command};
 use crate::{
-    parser::{Parse, MapParsedValInResult, FromTuple},
+    parser::traits::{Parse, MapParsedValInResult, FromTuple},
     tokens::{Braces, Brackets, DelimPair},
 };
 use nom::IResult;
@@ -54,7 +54,7 @@ impl<'a, D> FromTuple<(D::Left,&'a str, D::Right)> for ArbitraryDelimitedArg<'a,
 
 mod args_impls {
     use crate::{
-        parser::{Parse, ParseBefore},
+        parser::traits::{Parse, ParseBefore},
         tokens::{CharToken, DelimPair},
     };
 
@@ -73,7 +73,7 @@ mod args_impls {
 
 mod parse_impls {
     use crate::{
-        parser::ParseBefore,
+        parser::traits::ParseBefore,
         tokens::{CharToken, DelimPair},
     };
 
@@ -122,7 +122,7 @@ mod parse_before_impls {
     use nom::bytes::complete::{is_not, take_till1};
 
     use crate::{
-        parser::ParseBefore,
+        parser::traits::ParseBefore,
         tokens::{CharToken, DelimPair, LeftBrace, LeftBracket},
     };
 
