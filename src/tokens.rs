@@ -1,4 +1,4 @@
-use crate::parser::traits::Parse;
+use crate::parser::traits::{MapParsedValInResult, Parse};
 use core::default::Default;
 use nom::{
     character::complete::{char, line_ending},
@@ -25,8 +25,7 @@ macro_rules! declare_char_token_ty {
                 'b: 'c,
                 'b: 'a,
             {
-                let (remainder, token) = char($lit)(i)?;
-                Ok((remainder, $t(token)))
+                char($lit)(i).map_parsed_val($t)
             }
         }
 
@@ -48,8 +47,7 @@ macro_rules! declare_token_ty {
                 'b: 'c,
                 'b: 'a,
             {
-                let (remainder, token) = $($parsing)+(i)?;
-                Ok((remainder, $t(token)))
+                $($parsing)+(i).map_parsed_val($t)
             }
         }
 
