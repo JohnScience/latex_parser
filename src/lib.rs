@@ -1,6 +1,5 @@
 pub mod parser;
 pub mod tokens;
-pub(crate) mod util;
 
 #[cfg(test)]
 mod tests {
