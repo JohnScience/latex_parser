@@ -5,17 +5,23 @@ pub mod tokens;
 mod tests {
     use nom::combinator::value;
 
-    use crate::parser::{self, traits::Parse};
+    use crate::parser::{
+        self,
+        traits::{GroupByDelims, Parse},
+    };
 
     #[test]
     fn parse_comment() {
         use parser::comment::Comment;
 
-        let (i, Comment {
-            percent_sign,
-            text,
-            opt_line_ending,
-        }) = Comment::parse("% latex comment").unwrap();
+        let (
+            i,
+            Comment {
+                percent_sign,
+                text,
+                opt_line_ending,
+            },
+        ) = Comment::parse("% latex comment").unwrap();
 
         assert_eq!(percent_sign.0, '%');
         assert_eq!(text, " latex comment");
@@ -35,11 +41,14 @@ mod tests {
     fn parse_comment_in_multiline() {
         use parser::comment::Comment;
 
-        let (i, Comment {
-            percent_sign,
-            text,
-            opt_line_ending,
-        }) = Comment::parse(
+        let (
+            i,
+            Comment {
+                percent_sign,
+                text,
+                opt_line_ending,
+            },
+        ) = Comment::parse(
             "% latex comment\n\
             \\view{...}",
         )
@@ -55,15 +64,18 @@ mod tests {
     #[test]
     fn parse_arbitrary_command_without_optional_arg() {
         use crate::parser::command::arbitrary::{
-            ArbitraryArg::{Bracketed, Braced},
+            ArbitraryArg::{Braced, Bracketed},
             ArbitraryCommand,
         };
 
-        let (i, ArbitraryCommand {
-            backslash,
-            cmd_name,
-            arguments 
-        }) = ArbitraryCommand::parse(
+        let (
+            i,
+            ArbitraryCommand {
+                backslash,
+                cmd_name,
+                arguments,
+            },
+        ) = ArbitraryCommand::parse(
             "\\textbf{Command without optional arguments} % bold text\n\
             Next line",
         )
@@ -77,7 +89,7 @@ mod tests {
             Bracketed(_) => panic!(
                 "{} is expected to be {} variant",
                 stringify!(&arguments[0]),
-                stringify!(Required)
+                stringify!(Bracketed)
             ),
             Braced(required_argument) => {
                 assert_eq!(required_argument.left_delim.0, '{');
@@ -98,34 +110,22 @@ mod tests {
 
     #[test]
     fn parse_frac() {
-        use crate::parser::command::arbitrary::{
-            ArbitraryArg::{Bracketed, Braced},
-            ArbitraryBracedArg, ArbitraryBracketedArg, ArbitraryCommand,
-        };
+        use crate::parser::command::arbitrary::ArbitraryCommand;
 
-        let (i, ArbitraryCommand {
-            backslash,
-            cmd_name,
-            arguments 
-        }) = ArbitraryCommand::parse("\\frac{2}{5}").unwrap();
+        let (
+            i,
+            ArbitraryCommand {
+                backslash,
+                cmd_name,
+                arguments,
+            },
+        ) = ArbitraryCommand::parse("\\frac{2}{5}").unwrap();
 
         assert_eq!(backslash.0, '\\');
         assert_eq!(cmd_name, "frac");
         assert_eq!(arguments.len(), 2);
 
-        let (bracketed_args, braced_args) = arguments.into_iter().fold(
-            (
-                Vec::<ArbitraryBracketedArg>::new(),
-                Vec::<ArbitraryBracedArg>::new(),
-            ),
-            |(mut bracketed_args, mut braced_args), arg| {
-                match arg {
-                    Braced(braced_arg) => braced_args.push(braced_arg),
-                    Bracketed(bracketed_arg) => bracketed_args.push(bracketed_arg),
-                };
-                (bracketed_args, braced_args)
-            },
-        );
+        let (bracketed_args, braced_args) = arguments.group_by_delims();
 
         assert_eq!(bracketed_args.len(), 0);
         assert_eq!(braced_args.len(), 2);
