@@ -20,8 +20,8 @@ pub type ArbitraryBracketedArg<'a> = ArbitraryDelimitedArg<'a, Brackets>;
 pub type ArbitraryBracedArg<'a> = ArbitraryDelimitedArg<'a, Braces>;
 
 pub enum ArbitraryArg<'a> {
-    Optional(ArbitraryBracketedArg<'a>),
-    Required(ArbitraryBracedArg<'a>),
+    Bracketed(ArbitraryBracketedArg<'a>),
+    Braced(ArbitraryBracedArg<'a>),
 }
 
 pub type ArbitraryCommand<'a> = Command<'a, Vec<ArbitraryArg<'a>>>;
@@ -33,7 +33,7 @@ impl<'a> ArbitraryArg<'a> {
         'b: 'c,
         'b: 'a,
     {
-        ArbitraryBracketedArg::parse(i).map_parsed_val(ArbitraryArg::Optional)
+        ArbitraryBracketedArg::parse(i).map_parsed_val(ArbitraryArg::Bracketed)
     }
 
     fn parse_braced<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
@@ -41,7 +41,7 @@ impl<'a> ArbitraryArg<'a> {
         'b: 'c,
         'b: 'a,
     {
-        ArbitraryBracedArg::parse(i).map_parsed_val(ArbitraryArg::Required)
+        ArbitraryBracedArg::parse(i).map_parsed_val(ArbitraryArg::Braced)
     }
 }
 

@@ -55,7 +55,7 @@ mod tests {
     #[test]
     fn parse_arbitrary_command_without_optional_arg() {
         use crate::parser::command::arbitrary::{
-            ArbitraryArg::{Optional, Required},
+            ArbitraryArg::{Bracketed, Braced},
             ArbitraryCommand,
         };
 
@@ -74,12 +74,12 @@ mod tests {
         assert_eq!(arguments.len(), 1);
 
         match &arguments[0] {
-            Optional(_) => panic!(
+            Bracketed(_) => panic!(
                 "{} is expected to be {} variant",
                 stringify!(&arguments[0]),
                 stringify!(Required)
             ),
-            Required(required_argument) => {
+            Braced(required_argument) => {
                 assert_eq!(required_argument.left_delim.0, '{');
                 assert_eq!(
                     required_argument.verbatim,
@@ -99,7 +99,7 @@ mod tests {
     #[test]
     fn parse_frac() {
         use crate::parser::command::arbitrary::{
-            ArbitraryArg::{Optional, Required},
+            ArbitraryArg::{Bracketed, Braced},
             ArbitraryBracedArg, ArbitraryBracketedArg, ArbitraryCommand,
         };
 
@@ -113,29 +113,29 @@ mod tests {
         assert_eq!(cmd_name, "frac");
         assert_eq!(arguments.len(), 2);
 
-        let (opt_args, req_args) = arguments.into_iter().fold(
+        let (bracketed_args, braced_args) = arguments.into_iter().fold(
             (
                 Vec::<ArbitraryBracketedArg>::new(),
                 Vec::<ArbitraryBracedArg>::new(),
             ),
-            |(mut opt_args, mut req_args), arg| {
+            |(mut bracketed_args, mut braced_args), arg| {
                 match arg {
-                    Required(req_arg) => req_args.push(req_arg),
-                    Optional(opt_arg) => opt_args.push(opt_arg),
+                    Braced(braced_arg) => braced_args.push(braced_arg),
+                    Bracketed(bracketed_arg) => bracketed_args.push(bracketed_arg),
                 };
-                (opt_args, req_args)
+                (bracketed_args, braced_args)
             },
         );
 
-        assert_eq!(opt_args.len(), 0);
-        assert_eq!(req_args.len(), 2);
+        assert_eq!(bracketed_args.len(), 0);
+        assert_eq!(braced_args.len(), 2);
 
-        assert_eq!(req_args[0].left_delim.0, '{');
-        assert_eq!(req_args[0].verbatim, "2");
-        assert_eq!(req_args[0].right_delim.0, '}');
-        assert_eq!(req_args[1].left_delim.0, '{');
-        assert_eq!(req_args[1].verbatim, "5");
-        assert_eq!(req_args[1].right_delim.0, '}');
+        assert_eq!(braced_args[0].left_delim.0, '{');
+        assert_eq!(braced_args[0].verbatim, "2");
+        assert_eq!(braced_args[0].right_delim.0, '}');
+        assert_eq!(braced_args[1].left_delim.0, '{');
+        assert_eq!(braced_args[1].verbatim, "5");
+        assert_eq!(braced_args[1].right_delim.0, '}');
         assert_eq!(i, "");
     }
 }
