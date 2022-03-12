@@ -3,8 +3,8 @@ use crate::{
     parser::traits::{MapParsedValInResult, Parse},
     tokens::{Braces, Brackets, DelimPair},
 };
-use nom::IResult;
 use from_tuple::OrderDependentFromTuple;
+use nom::IResult;
 
 #[derive(OrderDependentFromTuple)]
 pub struct ArbitraryDelimitedArg<'a, D>

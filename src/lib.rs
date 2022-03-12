@@ -54,9 +54,12 @@ mod tests {
 
     #[test]
     fn parse_arbitrary_command_without_optional_arg() {
-        use crate::parser::command::arbitrary::ArbitraryArg::{Optional, Required};
+        use crate::parser::command::arbitrary::{
+            ArbitraryArg::{Optional, Required},
+            ArbitraryCommand,
+        };
 
-        let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse(
+        let (i, arbitrary_cmd) = ArbitraryCommand::parse(
             "\\textbf{Command without optional arguments} % bold text\n\
             Next line",
         )
@@ -89,10 +92,10 @@ mod tests {
     fn parse_frac() {
         use crate::parser::command::arbitrary::{
             ArbitraryArg::{Optional, Required},
-            ArbitraryBracedArg, ArbitraryBracketedArg,
+            ArbitraryBracedArg, ArbitraryBracketedArg, ArbitraryCommand,
         };
 
-        let (i, arbitrary_cmd) = parser::command::ArbitraryCommand::parse("\\frac{2}{5}").unwrap();
+        let (i, arbitrary_cmd) = ArbitraryCommand::parse("\\frac{2}{5}").unwrap();
         assert_eq!(arbitrary_cmd.backslash.0, '\\');
         assert_eq!(arbitrary_cmd.cmd_name, "frac");
         assert_eq!(arbitrary_cmd.arguments.len(), 2);

@@ -5,8 +5,6 @@ use nom::{sequence::tuple, IResult};
 
 pub mod arbitrary;
 
-pub use arbitrary::ArbitraryCommand;
-
 use super::traits::{MapParsedValInResult, ParseBefore};
 use from_tuple::OrderDependentFromTuple;
 
@@ -31,6 +29,7 @@ where
         'b: 'c,
         'b: 'a,
     {
-        tuple((Backslash::parse, A::parse_before, A::parse))(i).map_parsed_val(<_ as Into<Command<A>>>::into)
+        tuple((Backslash::parse, A::parse_before, A::parse))(i)
+            .map_parsed_val(<_ as Into<Command<A>>>::into)
     }
 }
