@@ -19,7 +19,8 @@ where
     where
         'a: 'b,
     {
-        (self.0, f(self.1))
+        let (remaining_input,parsed_val) = (self.0, self.1);
+        (remaining_input, f(parsed_val))
     }
 }
 
