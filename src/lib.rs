@@ -11,12 +11,12 @@ mod tests {
     fn parse_comment() {
         use parser::comment::Comment;
 
-        let (i, comment) = Comment::parse("% latex comment").unwrap();
-        let Comment {
+        let (i, Comment {
             percent_sign,
             text,
             opt_line_ending,
-        } = comment;
+        }) = Comment::parse("% latex comment").unwrap();
+
         assert_eq!(percent_sign.0, '%');
         assert_eq!(text, " latex comment");
         matches!(opt_line_ending, None);
@@ -35,16 +35,16 @@ mod tests {
     fn parse_comment_in_multiline() {
         use parser::comment::Comment;
 
-        let (i, comment) = Comment::parse(
+        let (i, Comment {
+            percent_sign,
+            text,
+            opt_line_ending,
+        }) = Comment::parse(
             "% latex comment\n\
             \\view{...}",
         )
         .unwrap();
-        let Comment {
-            percent_sign,
-            text,
-            opt_line_ending,
-        } = comment;
+
         assert_eq!(percent_sign.0, '%');
         assert_eq!(text, " latex comment");
         assert_eq!(opt_line_ending.map(|newtype| newtype.0), Some("\n"));
@@ -59,18 +59,26 @@ mod tests {
             ArbitraryCommand,
         };
 
-        let (i, arbitrary_cmd) = ArbitraryCommand::parse(
+        let (i, ArbitraryCommand {
+            backslash,
+            cmd_name,
+            arguments 
+        }) = ArbitraryCommand::parse(
             "\\textbf{Command without optional arguments} % bold text\n\
             Next line",
         )
         .unwrap();
 
-        assert_eq!(arbitrary_cmd.backslash.0, '\\');
-        assert_eq!(arbitrary_cmd.cmd_name, "textbf");
-        assert_eq!(arbitrary_cmd.arguments.len(), 1);
+        assert_eq!(backslash.0, '\\');
+        assert_eq!(cmd_name, "textbf");
+        assert_eq!(arguments.len(), 1);
 
-        match &arbitrary_cmd.arguments[0] {
-            Optional(_) => panic!("arbitrary_cmd.arguments[0] is not Required variant"),
+        match &arguments[0] {
+            Optional(_) => panic!(
+                "{} is expected to be {} variant",
+                stringify!(&arguments[0]),
+                stringify!(Required)
+            ),
             Required(required_argument) => {
                 assert_eq!(required_argument.left_delim.0, '{');
                 assert_eq!(
@@ -95,12 +103,17 @@ mod tests {
             ArbitraryBracedArg, ArbitraryBracketedArg, ArbitraryCommand,
         };
 
-        let (i, arbitrary_cmd) = ArbitraryCommand::parse("\\frac{2}{5}").unwrap();
-        assert_eq!(arbitrary_cmd.backslash.0, '\\');
-        assert_eq!(arbitrary_cmd.cmd_name, "frac");
-        assert_eq!(arbitrary_cmd.arguments.len(), 2);
+        let (i, ArbitraryCommand {
+            backslash,
+            cmd_name,
+            arguments 
+        }) = ArbitraryCommand::parse("\\frac{2}{5}").unwrap();
 
-        let (optional_arguments, required_arguments) = arbitrary_cmd.arguments.into_iter().fold(
+        assert_eq!(backslash.0, '\\');
+        assert_eq!(cmd_name, "frac");
+        assert_eq!(arguments.len(), 2);
+
+        let (opt_args, req_args) = arguments.into_iter().fold(
             (
                 Vec::<ArbitraryBracketedArg>::new(),
                 Vec::<ArbitraryBracedArg>::new(),
@@ -114,15 +127,15 @@ mod tests {
             },
         );
 
-        assert_eq!(optional_arguments.len(), 0);
-        assert_eq!(required_arguments.len(), 2);
+        assert_eq!(opt_args.len(), 0);
+        assert_eq!(req_args.len(), 2);
 
-        assert_eq!(required_arguments[0].left_delim.0, '{');
-        assert_eq!(required_arguments[0].verbatim, "2");
-        assert_eq!(required_arguments[0].right_delim.0, '}');
-        assert_eq!(required_arguments[1].left_delim.0, '{');
-        assert_eq!(required_arguments[1].verbatim, "5");
-        assert_eq!(required_arguments[1].right_delim.0, '}');
+        assert_eq!(req_args[0].left_delim.0, '{');
+        assert_eq!(req_args[0].verbatim, "2");
+        assert_eq!(req_args[0].right_delim.0, '}');
+        assert_eq!(req_args[1].left_delim.0, '{');
+        assert_eq!(req_args[1].verbatim, "5");
+        assert_eq!(req_args[1].right_delim.0, '}');
         assert_eq!(i, "");
     }
 }
