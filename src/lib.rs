@@ -5,14 +5,11 @@ pub mod tokens;
 mod tests {
     use nom::combinator::value;
 
-    use crate::parser::{
-        self,
-        traits::{GroupByDelims, Parse},
-    };
+    use crate::parser::traits::{GroupByDelims, Parse};
 
     #[test]
     fn parse_comment() {
-        use parser::comment::Comment;
+        use crate::parser::comment::Comment;
 
         let (
             i,
@@ -32,14 +29,14 @@ mod tests {
 
     #[test]
     fn skip_comment() {
-        use parser::comment::Comment;
+        use crate::parser::comment::Comment;
 
         assert_eq!(value((), Comment::parse)("% latex comment"), Ok(("", ())));
     }
 
     #[test]
     fn parse_comment_in_multiline() {
-        use parser::comment::Comment;
+        use crate::parser::comment::Comment;
 
         let (
             i,
