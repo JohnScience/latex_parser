@@ -38,8 +38,13 @@ LaTeX is a language for typesetting documents, especially scientific papers, and
 
 ![tex output](https://i.imgur.com/xptzo3h.jpg)
 
+# Related crates
+
+* [![crates.io](https://img.shields.io/crates/v/latex_parser.svg)][`include_display_mode_tex`] - a library for embedding TeX formulae in documentation.
+
 [`latex_parser`]: https://crates.io/crates/latex_parser
 [what is latex]: https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes#What_is_LaTeX.3F
+[`include_display_mode_tex`]: https://crates.io/crates/include_display_mode_tex
 
 # License
 
