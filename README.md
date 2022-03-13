@@ -3,9 +3,11 @@
 
 # LaTeX parser
 
+## What is LaTeX?
+
 LaTeX is a language for typesetting documents, especially scientific papers, and a document preparation system.
 
-# Example of .tex code
+## Example of .tex code
 
 ```tex
 % ...
@@ -34,13 +36,21 @@ LaTeX is a language for typesetting documents, especially scientific papers, and
 % ...
 ```
 
-## Output
+### Output
 
 ![tex output](https://i.imgur.com/xptzo3h.jpg)
 
-# Resources on LaTeX
+## Resources on LaTeX
 
 * [LateX documentation on Overleaf](https://www.overleaf.com/learn)
+
+# How `latex_parser` works
+
+First and foremost, [`latex_parser`] is a [`nom`]-based parser.
+
+According to [`nom`]'s documentation,
+
+> nom is a parser combinators library written in Rust. Its goal is to provide tools to build safe parsers without compromising the speed or memory consumption. To that end, it uses extensively Rust's strong typing and memory safety to produce fast and correct parsers, and provides functions, macros and traits to abstract most of the error prone plumbing.
 
 # Related crates
 
@@ -49,6 +59,7 @@ LaTeX is a language for typesetting documents, especially scientific papers, and
 [`latex_parser`]: https://crates.io/crates/latex_parser
 [what is latex]: https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes#What_is_LaTeX.3F
 [`include_display_mode_tex`]: https://crates.io/crates/include_display_mode_tex
+[`nom`]: https://crates.io/crates/nom
 
 # License
 
