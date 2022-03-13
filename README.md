@@ -40,7 +40,7 @@ LaTeX is a language for typesetting documents, especially scientific papers, and
 
 # Related crates
 
-* [![crates.io](https://img.shields.io/crates/v/latex_parser.svg)][`include_display_mode_tex`] - a library for embedding TeX formulae in documentation.
+* [`include_display_mode_tex`] - a library for embedding TeX formulae in documentation.
 
 [`latex_parser`]: https://crates.io/crates/latex_parser
 [what is latex]: https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes#What_is_LaTeX.3F
