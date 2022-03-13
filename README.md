@@ -38,6 +38,10 @@ LaTeX is a language for typesetting documents, especially scientific papers, and
 
 ![tex output](https://i.imgur.com/xptzo3h.jpg)
 
+# Resources on LaTeX
+
+* [LateX documentation on Overleaf](https://www.overleaf.com/learn)
+
 # Related crates
 
 * [`include_display_mode_tex`] - a library for embedding TeX formulae in documentation.
