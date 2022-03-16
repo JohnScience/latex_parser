@@ -52,17 +52,17 @@ First and foremost, [`latex_parser`] is a [`nom`]-based parser.
 
 According to [`nom`]'s documentation,
 
-> nom is a parser combinators library written in Rust. Its goal is to provide tools to build safe parsers without compromising the speed or memory consumption. To that end, it uses extensively Rust's strong typing and memory safety to produce fast and correct parsers, and provides functions, macros and traits to abstract most of the error prone plumbing.
+> nom is a [parser combinators][combinators] library written in Rust. Its goal is to provide tools to build safe parsers without compromising the speed or memory consumption. To that end, it uses extensively Rust's strong typing and memory safety to produce fast and correct parsers, and provides functions, macros and traits to abstract most of the error prone plumbing.
 
 ### [`nom`]'s documentation
 
 * [docs.rs reference documentation](https://docs.rs/nom/latest/nom/)
 * [Various design documents and tutorials](https://github.com/Geal/nom/tree/main/doc)
-* [List of combinators and their behaviour](https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md)
+* [List of combinators and their behaviour][combinators]
 
 ## Design choices in [`latex_parser`]
 
-To be compatible with [`nom`], [`Parse`] - the main trait of [`latex_parser`] - contains the method [`parse`] returning [`nom::IResult`]. This tight coupling makes `<T<'a> as Parse<'a>>::parse` an acceptable argument for [`nom`] combinators, thereby simplifying the development of [`latex_parser`].
+To be compatible with [`nom`], [`Parse`] - the main trait of [`latex_parser`] - contains the method [`parse`] returning [`nom::IResult`]. This tight coupling makes `<T<'a> as Parse<'a>>::parse` an acceptable argument for [`nom`] [combinators], thereby simplifying the development of [`latex_parser`].
 
 # Related crates
 
@@ -75,6 +75,7 @@ To be compatible with [`nom`], [`Parse`] - the main trait of [`latex_parser`] - 
 [`Parse`]: https://docs.rs/nom/latest/latex_parser/trait.Parse.html
 [`parse`]: https://docs.rs/nom/latest/latex_parser/trait.Parse.html#tymethod.parse
 [`nom::IResult`]: https://docs.rs/nom/latest/nom/type.IResult.html
+[combinators]: https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md
 
 # License
 
