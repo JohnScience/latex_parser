@@ -77,7 +77,7 @@ To be compatible with [`nom`], [`Parse`] - the main trait of [`latex_parser`] - 
 [`nom::IResult`]: https://docs.rs/nom/latest/nom/type.IResult.html
 [combinators]: https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md
 
-[^1]: `<Type as Trait>::method` is so-called [Fully-Qualified Syntax](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name). Since all types in the library don't copy the contents of the parsed strings, the references in the structure can't outlive the referenced string slices.
+[^1]: `<Type as Trait>::method` is so-called [Fully-Qualified Syntax](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name). Since all types in the library don't copy the contents of the parsed strings, the references in the structure can't outlive the referenced string slices. `'a` is the [lifetime](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html#lifetime-annotations-in-struct-definitions) of the stored references.
 
 # License
 
