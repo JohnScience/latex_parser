@@ -42,7 +42,7 @@ LaTeX is a language for typesetting documents, especially scientific papers, and
 
 ## Resources on LaTeX
 
-* [LateX documentation on Overleaf](https://www.overleaf.com/learn)
+* [LaTeX documentation on Overleaf](https://www.overleaf.com/learn)
 
 # How [`latex_parser`] works
 
