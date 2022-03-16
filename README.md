@@ -68,6 +68,8 @@ To be compatible with [`nom`], [`Parse`] - the main trait of [`latex_parser`] - 
 
 * [`include_display_mode_tex`] - a library for embedding TeX formulae in documentation.
 
+[^1]: `<Type as Trait>::method` is so-called [Fully-Qualified Syntax](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name). Since all types in the [`latex_parser`] don't copy the contents of the parsed [strings](https://doc.rust-lang.org/rust-by-example/std/str.html), the references in the structure can't outlive the referenced [string slices](https://doc.rust-lang.org/core/primitive.str.html). So `'a` is the [lifetime](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html#lifetime-annotations-in-struct-definitions) of the stored references.
+
 [`latex_parser`]: https://crates.io/crates/latex_parser
 [what is latex]: https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes#What_is_LaTeX.3F
 [`include_display_mode_tex`]: https://crates.io/crates/include_display_mode_tex
@@ -76,8 +78,6 @@ To be compatible with [`nom`], [`Parse`] - the main trait of [`latex_parser`] - 
 [`parse`]: https://docs.rs/nom/latest/latex_parser/trait.Parse.html#tymethod.parse
 [`nom::IResult`]: https://docs.rs/nom/latest/nom/type.IResult.html
 [combinators]: https://github.com/Geal/nom/blob/main/doc/choosing_a_combinator.md
-
-[^1]: `<Type as Trait>::method` is so-called [Fully-Qualified Syntax](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name). Since all types in the library don't copy the contents of the parsed strings, the references in the structure can't outlive the referenced string slices. `'a` is the [lifetime](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html#lifetime-annotations-in-struct-definitions) of the stored references.
 
 # License
 
