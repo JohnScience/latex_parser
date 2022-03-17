@@ -5,5 +5,5 @@ mod parse_before;
 
 pub use group_by_delims::GroupByDelims;
 pub use map_parsed_val::{MapParsedValInResult, MapParsedValInTuple};
-pub use parse::Parse;
+pub use parse::ParseStr;
 pub use parse_before::ParseBefore;

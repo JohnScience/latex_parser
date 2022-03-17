@@ -1,5 +1,5 @@
 use crate::{
-    parser::traits::{MapParsedValInResult, Parse},
+    parser::traits::{MapParsedValInResult, ParseStr},
     tokens::{LineEnding, PercentSign},
 };
 use from_tuple::OrderDependentFromTuple;
@@ -12,7 +12,7 @@ pub struct Comment<'a> {
     pub opt_line_ending: Option<LineEnding<'a>>,
 }
 
-impl<'a> Parse<'a> for Comment<'a> {
+impl<'a> ParseStr<'a> for Comment<'a> {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
         'b: 'c,

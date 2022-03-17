@@ -5,7 +5,7 @@ pub mod tokens;
 mod tests {
     use nom::combinator::value;
 
-    use crate::parser::traits::{GroupByDelims, Parse};
+    use crate::parser::traits::{GroupByDelims, ParseStr};
 
     #[test]
     fn parse_comment() {

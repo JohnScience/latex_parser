@@ -1,4 +1,4 @@
-use crate::parser::traits::{MapParsedValInResult, Parse};
+use crate::parser::traits::{MapParsedValInResult, ParseStr};
 use core::default::Default;
 use nom::{
     character::complete::{char, line_ending},
@@ -19,7 +19,7 @@ macro_rules! declare_char_token_ty {
             const CHAR_STR: &'static str = stringify!($lit);
         }
 
-        impl<'a> Parse<'a> for $t {
+        impl<'a> ParseStr<'a> for $t {
             fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
             where
                 'b: 'c,
@@ -41,7 +41,7 @@ macro_rules! declare_token_ty {
     ($t:ident$(<$l:lifetime>)?[$lit:literal: $lit_t:ty]::$($parsing:tt)+) => {
         pub struct $t$(<$l>)?(pub $lit_t);
 
-        impl<'a> Parse<'a> for $t$(<$l>)? {
+        impl<'a> ParseStr<'a> for $t$(<$l>)? {
             fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
             where
                 'b: 'c,

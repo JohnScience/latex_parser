@@ -1,4 +1,4 @@
-use crate::parser::traits::Parse;
+use crate::parser::traits::ParseStr;
 
 use crate::tokens::Backslash;
 use nom::{sequence::tuple, IResult};
@@ -18,9 +18,9 @@ where
     pub arguments: A,
 }
 
-pub trait Args<'a>: Parse<'a> + ParseBefore<'a> {}
+pub trait Args<'a>: ParseStr<'a> + ParseBefore<'a> {}
 
-impl<'a, A> Parse<'a> for Command<'a, A>
+impl<'a, A> ParseStr<'a> for Command<'a, A>
 where
     A: Args<'a>,
 {

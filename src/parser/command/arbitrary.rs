@@ -1,6 +1,6 @@
 use super::{Args, Command};
 use crate::{
-    parser::traits::{MapParsedValInResult, Parse},
+    parser::traits::{MapParsedValInResult, ParseStr},
     tokens::{Braces, Brackets, DelimPair},
 };
 use from_tuple::OrderDependentFromTuple;
@@ -47,7 +47,7 @@ impl<'a> ArbitraryArg<'a> {
 
 mod args_impls {
     use crate::{
-        parser::traits::{Parse, ParseBefore},
+        parser::traits::{ParseStr, ParseBefore},
         tokens::{CharToken, DelimPair},
     };
 
@@ -56,8 +56,8 @@ mod args_impls {
     impl<'a, D> Args<'a> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
-        D::Right: ParseBefore<'a> + CharToken + Parse<'a>,
+        D::Left: ParseBefore<'a> + CharToken + ParseStr<'a>,
+        D::Right: ParseBefore<'a> + CharToken + ParseStr<'a>,
     {
     }
     impl<'a> Args<'a> for ArbitraryArg<'a> {}
@@ -70,14 +70,14 @@ mod parse_impls {
         tokens::{CharToken, DelimPair},
     };
 
-    use super::{ArbitraryArg, ArbitraryDelimitedArg, MapParsedValInResult, Parse};
+    use super::{ArbitraryArg, ArbitraryDelimitedArg, MapParsedValInResult, ParseStr};
     use nom::{branch::alt, multi::many0, sequence::tuple, IResult};
 
-    impl<'a, D> Parse<'a> for ArbitraryDelimitedArg<'a, D>
+    impl<'a, D> ParseStr<'a> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: Parse<'a>,
-        D::Right: Parse<'a> + ParseBefore<'a> + CharToken,
+        D::Left: ParseStr<'a>,
+        D::Right: ParseStr<'a> + ParseBefore<'a> + CharToken,
     {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
@@ -90,7 +90,7 @@ mod parse_impls {
         }
     }
 
-    impl<'a> Parse<'a> for ArbitraryArg<'a> {
+    impl<'a> ParseStr<'a> for ArbitraryArg<'a> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,
@@ -101,7 +101,7 @@ mod parse_impls {
         }
     }
 
-    impl<'a> Parse<'a> for Vec<ArbitraryArg<'a>> {
+    impl<'a> ParseStr<'a> for Vec<ArbitraryArg<'a>> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,
