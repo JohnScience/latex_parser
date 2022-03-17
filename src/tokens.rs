@@ -1,4 +1,9 @@
-use crate::parser::traits::{MapParsedValInResult, ParseStr};
+use crate::parser::{
+    // Impls of CanonicalSpanTupleExt have to be code generated for the lack of required kind
+    // of specialization
+    span::{CanonicalSpanTupleExt, SpanInfo, SpanTuple},
+    traits::{MapParsedValInResult, ParseStr}
+};
 use core::default::Default;
 use nom::{
     character::complete::{char, line_ending},
@@ -33,6 +38,16 @@ macro_rules! declare_char_token_ty {
             fn default() -> Self {
                 Self(Self::CHAR)
             }
+        }
+
+        impl<'a> SpanTuple<'a> for (SpanInfo,$t,()) {
+            type BeginSpanInfo = SpanInfo;
+            type Lexeme = $t;
+            type EndSpanInfo = ();
+        } 
+
+        impl<'a> CanonicalSpanTupleExt<'a> for $t {
+            type CanonicalSpanTuple = (SpanInfo,Self,());
         }
     };
 }

@@ -1,28 +1,30 @@
 // TODO: come up with better naming
-use core::marker::PhantomData;
 use nom_locate::LocatedSpan;
-use crate::parser::traits::ParseStr;
+use crate::{parser::traits::ParseStr};
 
 pub type StrSpan<'a> = LocatedSpan<&'a str>;
 
-struct Span {
+pub struct SpanInfo {
     offset: u32,
     line: u32,
     column: u32,
 }
 
-trait SpanTuple<'a> {
+pub trait SpanTuple<'a> {
     type BeginSpanInfo;
     type Lexeme: ParseStr<'a>;
     type EndSpanInfo;
 }
 
-struct ShallowSpanned<'a,S>
+pub trait CanonicalSpanTupleExt<'a> {
+    type CanonicalSpanTuple: SpanTuple<'a>;
+}
+
+pub struct ShallowSpanned<'a,T>
 where
-    S: SpanTuple<'a>,
+    T: CanonicalSpanTupleExt<'a>,
 {
-    begin: S::BeginSpanInfo,
-    value: S::Lexeme,
-    end: S::EndSpanInfo,
-    phantom: PhantomData<&'a ()>
+    begin: <<T as CanonicalSpanTupleExt<'a>>::CanonicalSpanTuple as SpanTuple<'a>>::BeginSpanInfo,
+    value: <<T as CanonicalSpanTupleExt<'a>>::CanonicalSpanTuple as SpanTuple<'a>>::Lexeme,
+    end: <<T as CanonicalSpanTupleExt<'a>>::CanonicalSpanTuple as SpanTuple<'a>>::EndSpanInfo,
 }
