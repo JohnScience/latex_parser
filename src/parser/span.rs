@@ -1,6 +1,6 @@
 // TODO: come up with better naming
 use nom_locate::LocatedSpan;
-use crate::{parser::traits::Parse};
+use crate::parser::traits::{Parse,LifetimizedExt};
 
 pub type StrSpan<'a> = LocatedSpan<&'a str>;
 
@@ -27,4 +27,8 @@ where
     begin: <<T as CanonicalSpanTupleExt<'a>>::CanonicalSpanTuple as SpanTuple<'a>>::BeginSpanInfo,
     value: <<T as CanonicalSpanTupleExt<'a>>::CanonicalSpanTuple as SpanTuple<'a>>::Lexeme,
     end: <<T as CanonicalSpanTupleExt<'a>>::CanonicalSpanTuple as SpanTuple<'a>>::EndSpanInfo,
+}
+
+impl<'a> LifetimizedExt for StrSpan<'a> {
+    type Lifetimized<'b> = StrSpan<'b>;
 }

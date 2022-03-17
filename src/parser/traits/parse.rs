@@ -5,6 +5,10 @@ use crate::parser::{
     span::StrSpan,
     traits::LifetimizedExt
 };
+pub trait ParsableInput: LifetimizedExt {}
+
+impl<'a> ParsableInput for &'a str {}
+impl<'a> ParsableInput for StrSpan<'a> {}
 
 pub trait Parse<'a>: Sized + LifetimizedExt {
     /// Returns [`Result<P,E>`] where any [`Ok(p)`] is a pair `(i,val)`, s.t.
