@@ -12,7 +12,7 @@ pub struct SpanInfo {
 
 pub trait SpanTuple<'a> {
     type BeginSpanInfo;
-    type Lexeme: Parse<'a>;
+    type Lexeme: for <'b> Parse<'a,&'b str>;
     type EndSpanInfo;
 }
 

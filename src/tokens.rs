@@ -28,7 +28,7 @@ macro_rules! declare_char_token_ty {
             type Lifetimized<'a> = $t;
         }
 
-        impl<'a> Parse<'a> for $t {
+        impl<'a> Parse<'a,&str> for $t {
             fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
             where
                 'b: 'c,
@@ -64,7 +64,7 @@ macro_rules! declare_token_ty {
             type Lifetimized<'b> = $t<'b>;
         }
 
-        impl$(<$l>)? Parse$(<$l>)? for $t$(<$l>)? {
+        impl$(<$l>)? Parse$(<$l,&str>)? for $t$(<$l>)? {
             fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
             where
                 'b: 'c,

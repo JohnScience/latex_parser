@@ -1,4 +1,4 @@
-use crate::parser::traits::{Parse, LifetimizedExt};
+use crate::parser::traits::{Parse, LifetimizedExt, ParsableInput};
 
 use crate::tokens::Backslash;
 use nom::{sequence::tuple, IResult};
@@ -11,28 +11,30 @@ use from_tuple::OrderDependentFromTuple;
 #[derive(OrderDependentFromTuple)]
 pub struct Command<'a, A>
 where
-    A: Args<'a>,
+    for<'b> A: Args<'a,&'b str>,
 {
     pub backslash: Backslash,
     pub cmd_name: &'a str,
     pub arguments: A,
 }
 
-#[marker]
-pub trait Args<'a>: LifetimizedExt + Parse<'a> + ParseBefore<'a> {}
+pub trait Args<'a,I>: LifetimizedExt + Parse<'a,I> + ParseBefore<'a>
+where
+    I: ParsableInput
+{}
 
 impl<'a,A> LifetimizedExt for Command<'a, A>
 where
-    A: Args<'a>,
-    for<'b> <A as LifetimizedExt>::Lifetimized<'b>: Args<'b>
+    for<'b> A: Args<'a,&'b str>,
+    for<'b,'c> <A as LifetimizedExt>::Lifetimized<'b>: Args<'b,&'c str>
 {
     type Lifetimized<'b> = Command<'b, A::Lifetimized<'b>>;
 }
 
-impl<'a, A> Parse<'a> for Command<'a, A>
+impl<'a,A> Parse<'a,&str> for Command<'a, A>
 where
-    A: Args<'a>,
-    for<'b> <A as LifetimizedExt>::Lifetimized<'b>: Args<'b>
+    for<'b> A: Args<'a,&'b str>,
+    for<'b,'c> <A as LifetimizedExt>::Lifetimized<'b>: Args<'b,&'c str>
 {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where

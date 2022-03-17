@@ -17,7 +17,7 @@ impl<'a> LifetimizedExt for Comment<'a> {
     type Lifetimized<'b> = Comment<'b>;
 }
 
-impl<'a> Parse<'a> for Comment<'a> {
+impl<'a> Parse<'a,&str> for Comment<'a> {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where
         'b: 'c,

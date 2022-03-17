@@ -56,8 +56,8 @@ mod lifetimized_ext_impls {
     impl<'a, D> LifetimizedExt for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
-        D::Right: ParseBefore<'a> + CharToken + Parse<'a>,
+        for<'b> D::Left: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
+        for<'b> D::Right: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
     {
         type Lifetimized<'b> = ArbitraryDelimitedArg<'b,D>;
     }
@@ -77,15 +77,15 @@ mod args_impls {
 
     use super::{ArbitraryArg, ArbitraryDelimitedArg, Args};
 
-    impl<'a, D> Args<'a> for ArbitraryDelimitedArg<'a, D>
+    impl<'a, D> Args<'a,&str> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
-        D::Right: ParseBefore<'a> + CharToken + Parse<'a>,
+        for<'b> D::Left: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
+        for<'b> D::Right: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
     {
     }
-    impl<'a> Args<'a> for ArbitraryArg<'a> {}
-    impl<'a> Args<'a> for Vec<ArbitraryArg<'a>> {}
+    impl<'a> Args<'a,&str> for ArbitraryArg<'a> {}
+    impl<'a> Args<'a,&str> for Vec<ArbitraryArg<'a>> {}
 }
 
 mod parse_impls {
@@ -97,11 +97,11 @@ mod parse_impls {
     use super::{ArbitraryArg, ArbitraryDelimitedArg, MapParsedValInResult, Parse};
     use nom::{branch::alt, multi::many0, sequence::tuple, IResult};
 
-    impl<'a, D> Parse<'a> for ArbitraryDelimitedArg<'a, D>
+    impl<'a,D> Parse<'a,&str> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
-        D::Right: Parse<'a> + ParseBefore<'a> + CharToken,
+        for<'b> D::Left: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
+        for<'b> D::Right: Parse<'a,&'b str> + ParseBefore<'a> + CharToken,
     {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
@@ -114,7 +114,7 @@ mod parse_impls {
         }
     }
 
-    impl<'a> Parse<'a> for ArbitraryArg<'a> {
+    impl<'a> Parse<'a,&str> for ArbitraryArg<'a> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,
@@ -125,7 +125,7 @@ mod parse_impls {
         }
     }
 
-    impl<'a> Parse<'a> for Vec<ArbitraryArg<'a>> {
+    impl<'a> Parse<'a,&str> for Vec<ArbitraryArg<'a>> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,

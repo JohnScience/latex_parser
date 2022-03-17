@@ -4,7 +4,7 @@ use nom::IResult;
 
 pub trait MapParsedValInTuple<'a, T>
 where
-    T: super::Parse<'a>,
+    for<'c> T: super::Parse<'a,&'c str>,
 {
     fn map_parsed_val<'b, U, F: FnOnce(T) -> U>(self, f: F) -> (&'b str, U)
     where
@@ -13,7 +13,7 @@ where
 
 impl<'a, T> MapParsedValInTuple<'a, T> for (&'a str, T)
 where
-    T: super::Parse<'a>,
+    for<'c> T: super::Parse<'a,&'c str>,
 {
     fn map_parsed_val<'b, U, F: FnOnce(T) -> U>(self, f: F) -> (&'b str, U)
     where
