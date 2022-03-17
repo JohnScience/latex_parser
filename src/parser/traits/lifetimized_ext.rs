@@ -9,8 +9,16 @@ where
     type Lifetimized<'a> = Option<T::Lifetimized<'a>>;
 }
 
-impl<'a> LifetimizedExt for &'a str {
-    type Lifetimized<'b> = &'b str;
+impl<'a,T> LifetimizedExt for &'a T
+where
+    T: 'static
+{
+    type Lifetimized<'b> = &'b T;
 }
 
-// impl<'a> 
+impl<'a,T> LifetimizedExt for &'a mut T
+where
+    T: 'static
+{
+    type Lifetimized<'b> = &'b mut T;
+}
