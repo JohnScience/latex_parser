@@ -11,14 +11,14 @@ where
 
 impl<'a,T> LifetimizedExt for &'a T
 where
-    T: 'static
+    T: 'static + ?Sized
 {
     type Lifetimized<'b> = &'b T;
 }
 
 impl<'a,T> LifetimizedExt for &'a mut T
 where
-    T: 'static
+    T: 'static + ?Sized
 {
     type Lifetimized<'b> = &'b mut T;
 }
