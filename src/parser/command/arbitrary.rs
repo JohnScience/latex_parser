@@ -56,8 +56,8 @@ mod lifetimized_ext_impls {
     impl<'a, D> LifetimizedExt for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        for<'b> D::Left: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
-        for<'b> D::Right: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
+        for<'b,'c> D::Left: ParseBefore<'a,&'c str> + CharToken + Parse<'a,&'b str>,
+        for<'b,'c> D::Right: ParseBefore<'a,&'c str> + CharToken + Parse<'a,&'b str>,
     {
         type Lifetimized<'b> = ArbitraryDelimitedArg<'b,D>;
     }
@@ -80,8 +80,8 @@ mod args_impls {
     impl<'a, D> Args<'a,&str> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        for<'b> D::Left: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
-        for<'b> D::Right: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
+        for<'b,'c> D::Left: ParseBefore<'a,&'c str> + CharToken + Parse<'a,&'b str>,
+        for<'b,'c> D::Right: ParseBefore<'a,&'c str> + CharToken + Parse<'a,&'b str>,
     {
     }
     impl<'a> Args<'a,&str> for ArbitraryArg<'a> {}
@@ -100,8 +100,8 @@ mod parse_impls {
     impl<'a,D> Parse<'a,&str> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        for<'b> D::Left: ParseBefore<'a> + CharToken + Parse<'a,&'b str>,
-        for<'b> D::Right: Parse<'a,&'b str> + ParseBefore<'a> + CharToken,
+        for<'b,'c> D::Left: ParseBefore<'a,&'c str> + CharToken + Parse<'a,&'b str>,
+        for<'b,'c> D::Right: Parse<'a,&'b str> + ParseBefore<'a,&'c str> + CharToken,
     {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
@@ -146,7 +146,7 @@ mod parse_before_impls {
 
     use super::{ArbitraryArg, ArbitraryDelimitedArg};
 
-    impl<'a, C> ParseBefore<'a> for C
+    impl<'a, C> ParseBefore<'a,&str> for C
     where
         C: CharToken,
     {
@@ -159,10 +159,10 @@ mod parse_before_impls {
         }
     }
 
-    impl<'a, D> ParseBefore<'a> for ArbitraryDelimitedArg<'a, D>
+    impl<'a, D> ParseBefore<'a,&str> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: CharToken + ParseBefore<'a>,
+        for<'b> D::Left: CharToken + ParseBefore<'a,&'b str>,
     {
         fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
         where
@@ -173,7 +173,7 @@ mod parse_before_impls {
         }
     }
 
-    impl<'a> ParseBefore<'a> for ArbitraryArg<'a> {
+    impl<'a> ParseBefore<'a,&str> for ArbitraryArg<'a> {
         fn parse_before<'b, 'c>(i: &'b str) -> nom::IResult<&'c str, &'a str>
         where
             'b: 'c,

@@ -18,7 +18,7 @@ where
     pub arguments: A,
 }
 
-pub trait Args<'a,I>: LifetimizedExt + Parse<'a,I> + ParseBefore<'a>
+pub trait Args<'a,I>: LifetimizedExt + Parse<'a,I> + ParseBefore<'a,I>
 where
     I: ParsableInput
 {}
