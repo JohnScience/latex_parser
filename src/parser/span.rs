@@ -1,6 +1,6 @@
 // TODO: come up with better naming
 use nom_locate::LocatedSpan;
-use crate::{parser::traits::ParseStr};
+use crate::{parser::traits::Parse};
 
 pub type StrSpan<'a> = LocatedSpan<&'a str>;
 
@@ -12,7 +12,7 @@ pub struct SpanInfo {
 
 pub trait SpanTuple<'a> {
     type BeginSpanInfo;
-    type Lexeme: ParseStr<'a>;
+    type Lexeme: Parse<'a>;
     type EndSpanInfo;
 }
 

@@ -1,6 +1,6 @@
 use super::{Args, Command};
 use crate::{
-    parser::traits::{MapParsedValInResult, ParseStr},
+    parser::traits::{MapParsedValInResult, Parse},
     tokens::{Braces, Brackets, DelimPair},
 };
 use from_tuple::OrderDependentFromTuple;
@@ -45,9 +45,33 @@ impl<'a> ArbitraryArg<'a> {
     }
 }
 
+mod lifetimized_ext_impls {
+    use crate::{
+        parser::traits::{LifetimizedExt,Parse, ParseBefore},
+        tokens::{CharToken, DelimPair},
+    };
+
+    use super::{ArbitraryArg, ArbitraryDelimitedArg};
+
+    impl<'a, D> LifetimizedExt for ArbitraryDelimitedArg<'a, D>
+    where
+        D: DelimPair,
+        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
+        D::Right: ParseBefore<'a> + CharToken + Parse<'a>,
+    {
+        type Lifetimized<'b> = ArbitraryDelimitedArg<'b,D>;
+    }
+    impl<'a> LifetimizedExt for ArbitraryArg<'a> {
+        type Lifetimized<'b> = ArbitraryArg<'b>;
+    }
+    impl<'a> LifetimizedExt for Vec<ArbitraryArg<'a>> {
+        type Lifetimized<'b> = Vec<ArbitraryArg<'b>>;
+    }
+}
+
 mod args_impls {
     use crate::{
-        parser::traits::{ParseStr, ParseBefore},
+        parser::traits::{Parse, ParseBefore},
         tokens::{CharToken, DelimPair},
     };
 
@@ -56,8 +80,8 @@ mod args_impls {
     impl<'a, D> Args<'a> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: ParseBefore<'a> + CharToken + ParseStr<'a>,
-        D::Right: ParseBefore<'a> + CharToken + ParseStr<'a>,
+        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
+        D::Right: ParseBefore<'a> + CharToken + Parse<'a>,
     {
     }
     impl<'a> Args<'a> for ArbitraryArg<'a> {}
@@ -70,14 +94,14 @@ mod parse_impls {
         tokens::{CharToken, DelimPair},
     };
 
-    use super::{ArbitraryArg, ArbitraryDelimitedArg, MapParsedValInResult, ParseStr};
+    use super::{ArbitraryArg, ArbitraryDelimitedArg, MapParsedValInResult, Parse};
     use nom::{branch::alt, multi::many0, sequence::tuple, IResult};
 
-    impl<'a, D> ParseStr<'a> for ArbitraryDelimitedArg<'a, D>
+    impl<'a, D> Parse<'a> for ArbitraryDelimitedArg<'a, D>
     where
         D: DelimPair,
-        D::Left: ParseStr<'a>,
-        D::Right: ParseStr<'a> + ParseBefore<'a> + CharToken,
+        D::Left: ParseBefore<'a> + CharToken + Parse<'a>,
+        D::Right: Parse<'a> + ParseBefore<'a> + CharToken,
     {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
@@ -90,7 +114,7 @@ mod parse_impls {
         }
     }
 
-    impl<'a> ParseStr<'a> for ArbitraryArg<'a> {
+    impl<'a> Parse<'a> for ArbitraryArg<'a> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,
@@ -101,7 +125,7 @@ mod parse_impls {
         }
     }
 
-    impl<'a> ParseStr<'a> for Vec<ArbitraryArg<'a>> {
+    impl<'a> Parse<'a> for Vec<ArbitraryArg<'a>> {
         fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
         where
             'b: 'c,

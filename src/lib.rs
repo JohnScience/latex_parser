@@ -1,3 +1,7 @@
+#![feature(min_specialization)]
+#![feature(generic_associated_types)]
+#![feature(marker_trait_attr)]
+
 pub mod parser;
 pub mod tokens;
 
@@ -5,7 +9,7 @@ pub mod tokens;
 mod tests {
     use nom::combinator::value;
 
-    use crate::parser::traits::{GroupByDelims, ParseStr};
+    use crate::parser::traits::{GroupByDelims, Parse};
 
     #[test]
     fn parse_comment() {

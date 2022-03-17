@@ -1,9 +1,12 @@
 // Proper declaration and implementation requires GATs
 
 use nom::{combinator::opt, IResult};
-use crate::parser::span::StrSpan;
+use crate::parser::{
+    span::StrSpan,
+    traits::LifetimizedExt
+};
 
-pub trait ParseStr<'a>: Sized {
+pub trait Parse<'a>: Sized + LifetimizedExt {
     /// Returns [`Result<P,E>`] where any [`Ok(p)`] is a pair `(i,val)`, s.t.
     /// * `i` is the remaining input after parsing
     /// * `val` is the parsed value
@@ -13,9 +16,9 @@ pub trait ParseStr<'a>: Sized {
         'b: 'a;
 }
 
-impl<'a, T> ParseStr<'a> for Option<T>
+impl<'a, T> Parse<'a> for Option<T>
 where
-    T: ParseStr<'a>,
+    T: Parse<'a> + LifetimizedExt,
 {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where

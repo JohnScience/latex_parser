@@ -1,4 +1,4 @@
-use crate::parser::traits::ParseStr;
+use crate::parser::traits::{Parse, LifetimizedExt};
 
 use crate::tokens::Backslash;
 use nom::{sequence::tuple, IResult};
@@ -18,11 +18,21 @@ where
     pub arguments: A,
 }
 
-pub trait Args<'a>: ParseStr<'a> + ParseBefore<'a> {}
+#[marker]
+pub trait Args<'a>: LifetimizedExt + Parse<'a> + ParseBefore<'a> {}
 
-impl<'a, A> ParseStr<'a> for Command<'a, A>
+impl<'a,A> LifetimizedExt for Command<'a, A>
 where
     A: Args<'a>,
+    for<'b> <A as LifetimizedExt>::Lifetimized<'b>: Args<'b>
+{
+    type Lifetimized<'b> = Command<'b, A::Lifetimized<'b>>;
+}
+
+impl<'a, A> Parse<'a> for Command<'a, A>
+where
+    A: Args<'a>,
+    for<'b> <A as LifetimizedExt>::Lifetimized<'b>: Args<'b>
 {
     fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
     where

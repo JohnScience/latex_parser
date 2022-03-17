@@ -2,7 +2,7 @@ use crate::parser::{
     // Impls of CanonicalSpanTupleExt have to be code generated for the lack of required kind
     // of specialization
     span::{CanonicalSpanTupleExt, SpanInfo, SpanTuple},
-    traits::{MapParsedValInResult, ParseStr}
+    traits::{MapParsedValInResult, Parse, LifetimizedExt}
 };
 use core::default::Default;
 use nom::{
@@ -24,7 +24,11 @@ macro_rules! declare_char_token_ty {
             const CHAR_STR: &'static str = stringify!($lit);
         }
 
-        impl<'a> ParseStr<'a> for $t {
+        impl LifetimizedExt for $t {
+            type Lifetimized<'a> = $t;
+        }
+
+        impl<'a> Parse<'a> for $t {
             fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
             where
                 'b: 'c,
@@ -56,7 +60,11 @@ macro_rules! declare_token_ty {
     ($t:ident$(<$l:lifetime>)?[$lit:literal: $lit_t:ty]::$($parsing:tt)+) => {
         pub struct $t$(<$l>)?(pub $lit_t);
 
-        impl<'a> ParseStr<'a> for $t$(<$l>)? {
+        impl$(<$l>)? LifetimizedExt for $t$(<$l>)? {
+            type Lifetimized<'b> = $t<'b>;
+        }
+
+        impl$(<$l>)? Parse$(<$l>)? for $t$(<$l>)? {
             fn parse<'b, 'c>(i: &'b str) -> IResult<&'c str, Self>
             where
                 'b: 'c,
