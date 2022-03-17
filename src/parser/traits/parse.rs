@@ -2,13 +2,8 @@
 
 use nom::{combinator::opt, IResult};
 use crate::parser::{
-    span::StrSpan,
-    traits::LifetimizedExt
+    traits::{LifetimizedExt, ParsableInput}
 };
-pub trait ParsableInput: LifetimizedExt {}
-
-impl<'a> ParsableInput for &'a str {}
-impl<'a> ParsableInput for StrSpan<'a> {}
 
 pub trait Parse<'a,I>: Sized + LifetimizedExt
 where
