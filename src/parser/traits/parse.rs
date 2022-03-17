@@ -35,13 +35,3 @@ where
         opt(T::parse)(i)
     }
 }
-
-pub trait ParseSpanned<'a>: Sized {
-    /// Returns [`Result<P,E>`] where any [`Ok(p)`] is a pair `(i,val)`, s.t.
-    /// * `i` is the remaining input after parsing
-    /// * `val` is the parsed value
-    fn parse<'b, 'c>(i: StrSpan<'b>) -> IResult<StrSpan<'c>, Self>
-    where
-        'b: 'c,
-        'b: 'a;
-}
