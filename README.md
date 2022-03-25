@@ -3,6 +3,8 @@
 
 # LaTeX parser
 
+Aborted in favor of [`pest`](https://crates.io/crates/pest) parser. Since TeX changes its grammar dynamically, implementation of TeX parser is unreasonably difficult.
+
 ## What is LaTeX?
 
 LaTeX is a language for typesetting documents, especially scientific papers, and a document preparation system.
