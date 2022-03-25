@@ -3,7 +3,7 @@
 
 # LaTeX parser
 
-Aborted in favor of [`pest`](https://crates.io/crates/pest) parser. Since TeX changes its grammar dynamically, implementation of TeX parser is unreasonably difficult.
+Aborted in favor of development [`pest`](https://crates.io/crates/pest) parser for LLVM. [Learn more here](https://github.com/cross-lang-and-cross-platform/cross-lang-and-cross-platform/blob/7447601fe283098b81b503ea4570b642f3aa6ad4/ONGOING_WORK.md). Since TeX changes its grammar dynamically, implementation of TeX parser is unreasonably difficult.
 
 ## What is LaTeX?
 
